@@ -1,3 +1,6 @@
+from . import Node
+from . import Edge
+
 class DAG:
     nodes_set = []
     edges_set = []
@@ -6,11 +9,22 @@ class DAG:
         self.nodes_set = []
         self.edges_set = []
 
-    def add_node(self, node):
+    # this method will create an instance of the class Node and add it to the nodes set instance variable
+    def add_node(self, variable_name):
+        node = Node(length(self.nodes_set), variable_name)
         self.nodes_set.append(node)
 
+    # this method will create an instance of the class Edge and add it to the edges set instance variable
     def add_edge(self, edge):
         self.edges_set.append(edge)
+
+    def get_nodes(self, node):
+        for node in nodes_set:
+            print(node.variable_name)
+        return
+
+    def get_edges(self, node):
+        return
 
     def get_parents(self, node):
         return
@@ -24,37 +38,8 @@ class DAG:
     def get_descendants(self, node):
         return
 
-    def draw_graph(self):
+    def get_adjacency_mat(self):
         return
 
-
-
-class Node:
-    id = 0
-    variable_name = ''
-    isRoot = False
-    isLeaf = False
-
-    def __init__(self, node_count, variable_name):
-        self.id = node_count
-        self.variable_name = variable_name
-        self.isRoot = False
-        self.isLeaf = False
-
-    def set_as_root(self):
-        self.isRoot = True
-
-    def set_as_leaf(self):
-        self.isLeaf = True
-
-
-
-class Edge:
-    id = 0
-    starting_node = 0
-    ending_node = 0
-
-    def __init__(self, edge_count, s_state, e_state):
-        self.id = edge_count
-        self.starting_node = s_state
-        self.ending_node = e_state
+    def draw_graph(self):
+        return
