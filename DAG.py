@@ -1,13 +1,16 @@
+import numpy as np
 from Node import Node
 from Edge import Edge
 
 class DAG:
     nodes_set = []
     edges_set = []
+    adjacency_matrix = []
 
     def __init__(self):
         self.nodes_set = []
         self.edges_set = []
+        self.adjacency_matrix = []
 
     # this method will create the DAG based on the definition passed as argument
     def create_dag(definition):
@@ -16,6 +19,7 @@ class DAG:
             dag.add_edge(edge.split("-")[0], edge.split("-")[1])
         for variable in sorted([c for c in list(set(definition)) if c.isalpha()]):
             dag.add_node(variable)
+        # dag.build_adjacency_matrix()
         return dag
 
     # this method will create an instance of the class Node and add it to the nodes set instance variable
@@ -30,20 +34,21 @@ class DAG:
         self.edges_set.append(edge)
         return
 
+    # this method inverts the specified edge direction
     def invert_edge(self, starting_node, ending_node):
+        for edge in self.edges_set:
+            if edge.starting_node == starting_node and edge.ending_node == ending_node:
+                edge.starting_node = ending_node
+                edge.ending_node = starting_node
         return
 
     # this method will return the list of the nodes in the DAG
     def get_nodes(self):
-        for node in self.nodes_set:
-            print(node.variable_name)
-        return
+        return self.nodes_set
 
     # this method will return the list of the edges in the DAG
     def get_edges(self):
-        for edge in self.edges_set:
-            print(edge.starting_node + "-" + edge.ending_node)
-        return
+        return self.edges_set
 
     # this method will return the list of the parents of a given node passed as argument
     def get_parents(self, node):
@@ -62,6 +67,7 @@ class DAG:
         return children
 
     def get_ancestors(self, node):
+
         return
 
     def get_descendants(self, node):
@@ -73,8 +79,13 @@ class DAG:
     def get_moralized_graph(self):
         return
 
-    def get_adjacency_mat(self):
-        return
+    def build_adjacency_matrix(self):
+        mat = np.zeros(shape = (len(self.nodes_set), len(self.nodes_set)), dtype = int)
+        for edge in self.edges_set:
+            mat[][] = 1
+            row = [1 if self.nodes_set[i].variable_name == self.edges_set[i].starting_node and elem == self.edges_set[i].ending_node else 0 for elem in self.nodes_set]
+
+        return mat
 
     def draw_graph(self):
         return

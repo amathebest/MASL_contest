@@ -7,13 +7,7 @@ from Dag import DAG
 # constants declaration
 
 
-definition = "a-b,a-c,c-b,b-d"
-
+definition = "a-b,a-c,c-b,b-d,a-e,e-d,c-f,b-f"
 dag = DAG.create_dag(definition)
 
-
-dag.get_nodes()
-
-dag.get_edges()
-
-dag.get_children("a")
+dag.build_adjacency_matrix()
