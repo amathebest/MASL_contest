@@ -10,4 +10,4 @@ from Dag import DAG
 definition = "a-b,a-c,c-b,b-d,a-e,e-d,c-f,b-f"
 dag = DAG.create_dag(definition)
 
-dag.build_adjacency_matrix()
+print(dag)

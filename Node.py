@@ -10,6 +10,9 @@ class Node:
         self.isRoot = False
         self.isLeaf = False
 
+    def __str__(self):
+        return self.variable_name
+
     def set_as_root(self):
         self.isRoot = True
 

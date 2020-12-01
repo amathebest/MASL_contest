@@ -12,6 +12,10 @@ class DAG:
         self.edges_set = []
         self.adjacency_matrix = []
 
+    def __str__(self):
+        output = "Nodes:\n" + str(self.nodes_set) + "\nEdges:\n" + str(self.edges_set)
+        return output
+
     # this method will create the DAG based on the definition passed as argument
     def create_dag(definition):
         dag = DAG()
@@ -19,7 +23,7 @@ class DAG:
             dag.add_edge(edge.split("-")[0], edge.split("-")[1])
         for variable in sorted([c for c in list(set(definition)) if c.isalpha()]):
             dag.add_node(variable)
-        # dag.build_adjacency_matrix()
+        dag.build_adjacency_matrix()
         return dag
 
     # this method will create an instance of the class Node and add it to the nodes set instance variable
@@ -67,7 +71,6 @@ class DAG:
         return children
 
     def get_ancestors(self, node):
-
         return
 
     def get_descendants(self, node):
@@ -82,10 +85,21 @@ class DAG:
     def build_adjacency_matrix(self):
         mat = np.zeros(shape = (len(self.nodes_set), len(self.nodes_set)), dtype = int)
         for edge in self.edges_set:
-            mat[][] = 1
-            row = [1 if self.nodes_set[i].variable_name == self.edges_set[i].starting_node and elem == self.edges_set[i].ending_node else 0 for elem in self.nodes_set]
-
-        return mat
+            i = 0
+            j = 0
+            # finding the index of the starting node
+            for node in self.nodes_set:
+                if node.variable_name == edge.starting_node:
+                    i = node.id
+                    break
+            # finding the index of the ending node
+            for node in self.nodes_set:
+                if node.variable_name == edge.ending_node:
+                    j = node.id
+                    break
+            mat[i][j] = 1 # setting to 1 the [i,j] entry of the adjacency matrix
+        self.adjacency_matrix = mat
+        return
 
     def draw_graph(self):
         return
