@@ -9,4 +9,10 @@ class Edge:
         self.ending_node = ending_node
 
     def __str__(self):
-        return self.starting_node + " -> " + self.ending_node
+        return self.starting_node + "-->" + self.ending_node
+
+    def __repr__(self):
+        return str(self)
+
+    def __eq__(self, other):
+        return self.starting_node == other.starting_node and self.ending_node == other.ending_node
