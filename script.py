@@ -7,12 +7,13 @@ from Dag import DAG
 # constants declaration
 
 
+definition = "a-b,a-c,c-b,b-d"
+
+dag = DAG.create_dag(definition)
 
 
-dag = DAG()
+dag.get_nodes()
 
+dag.get_edges()
 
-
-dag.add_node("Analysis")
-
-print(dag.get_nodes())
+dag.get_children("a")

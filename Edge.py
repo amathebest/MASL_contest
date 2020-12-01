@@ -1,9 +1,9 @@
 class Edge:
     id = 0
-    starting_node = 0
-    ending_node = 0
+    starting_node = ""
+    ending_node = ""
 
-    def __init__(self, edge_count, s_state, e_state):
+    def __init__(self, edge_count, starting_node, ending_node):
         self.id = edge_count
-        self.starting_node = s_state
-        self.ending_node = e_state
+        self.starting_node = starting_node
+        self.ending_node = ending_node
