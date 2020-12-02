@@ -1,5 +1,7 @@
+import os
 import numpy as np
 from collections import deque
+from graphviz import Digraph
 
 from Node import Node
 from Edge import Edge
@@ -96,6 +98,7 @@ class DAG:
                 children.append(edge.ending_node)
         return children
 
+    # this method returns the list of the ancestors of a given node passed as argument
     def get_ancestors(self, my_node):
         ancestors = []
         for node in self.nodes_set:
@@ -103,8 +106,13 @@ class DAG:
                 ancestors.append(node)
         return ancestors
 
-    def get_descendants(self, node):
-        return
+    # this method returns the list of the descendants of a given node passed as argument
+    def get_descendants(self, my_node):
+        descendants = []
+        for node in self.nodes_set:
+            if self.are_connected(my_node, node):
+                descendants.append(node)
+        return descendants
 
     def get_cliques(self):
         return
@@ -113,6 +121,17 @@ class DAG:
         return
 
     def draw_graph(self):
+        # creating the skeleton of the DAG
+        dot = Digraph(comment = "DAG", format = "png")
+        dot.graph_attr['rankdir'] = 'LR'
+        dot.graph_attr['Gdpi'] = '500'
+        # building DAG nodes
+        for node in self.nodes_set:
+            dot.node(str(node.variable_name), fontname = "consolas")
+        # building DAG edges
+        for edge in self.edges_set:
+            dot.edge(str(edge.starting_node), str(edge.ending_node), fontname = "consolas")
+        dot.render(os.path.dirname(os.path.realpath(__file__)) + "DAG", view = True, format = "png")
         return
 
     # this method determines if there is a path between the two nodes passed as argument
