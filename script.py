@@ -1,5 +1,8 @@
 # libraries import
+import os
+
 from Dag import DAG
+
 os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz 2.44.1/bin/'
 
 

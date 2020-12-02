@@ -120,9 +120,10 @@ class DAG:
     def get_moralized_graph(self):
         return
 
+    # this method draws the graph
     def draw_graph(self):
         # creating the skeleton of the DAG
-        dot = Digraph(comment = "DAG", format = "png")
+        dot = Digraph(comment = "DAG")
         dot.graph_attr['rankdir'] = 'LR'
         dot.graph_attr['Gdpi'] = '500'
         # building DAG nodes
