@@ -62,14 +62,6 @@ class DAG:
         self.adjacency_matrix = mat
         return
 
-    # this method inverts the specified edge direction
-    def invert_edge(self, starting_node, ending_node):
-        for edge in self.edges_set:
-            if edge.starting_node == starting_node and edge.ending_node == ending_node:
-                edge.starting_node = ending_node
-                edge.ending_node = starting_node
-        return
-
     # this method returns the list of the nodes in the DAG
     def get_nodes(self):
         return self.nodes_set
@@ -114,18 +106,11 @@ class DAG:
                 descendants.append(node)
         return descendants
 
-    def get_cliques(self):
-        return
-
-    def get_moralized_graph(self):
-        return
-
     # this method draws the graph
     def draw_graph(self):
         # creating the skeleton of the DAG
         dot = Digraph(comment = "DAG")
-        dot.graph_attr['rankdir'] = 'LR'
-        dot.graph_attr['Gdpi'] = '500'
+        dot.graph_attr['Gdpi'] = '1000'
         # building DAG nodes
         for node in self.nodes_set:
             dot.node(str(node.variable_name), fontname = "consolas")
@@ -156,7 +141,24 @@ class DAG:
                     bfs_queue.append(adjacent) # enqueuing the newly discovered node
         return False
 
+    # this method creates the moralized DAG starting from the one passed as argument
+    def get_moralized_graph(original_dag):
+        moralized_graph_edges_set = []
+        # looping on the transpose of the adjacency matrix to find the unmarried parents in the original DAG
+        for col in original_dag.adjacency_matrix.T:
+            print("wip")
 
+        # crating the moralized DAG
+        moralized_dag = DAG(",".join(moralized_graph_edges_set))
+        return moralized_dag
+
+    # this method inverts the specified edge direction
+    def invert_edge(self, starting_node, ending_node):
+        for edge in self.edges_set:
+            if edge.starting_node == starting_node and edge.ending_node == ending_node:
+                edge.starting_node = ending_node
+                edge.ending_node = starting_node
+        return
 
 
 #
