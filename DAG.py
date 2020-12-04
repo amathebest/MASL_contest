@@ -1,17 +1,20 @@
 import os
 import numpy as np
-from collections import deque
+from itertools import combinations
+from collections import deque, Counter
 from graphviz import Digraph
 
 from Node import Node
 from Edge import Edge
 
 class DAG:
+    definition = ""
     nodes_set = []
     edges_set = []
     adjacency_matrix = []
 
-    def __init__(self):
+    def __init__(self, definition):
+        self.definition = definition
         self.nodes_set = []
         self.edges_set = []
         self.adjacency_matrix = []
@@ -22,7 +25,7 @@ class DAG:
 
     # this method creates the DAG based on the definition passed as argument
     def create_dag(definition):
-        dag = DAG()
+        dag = DAG(definition)
         for edge in definition.split(","):
             dag.add_edge(edge.split("-")[0], edge.split("-")[1])
         for variable in sorted([c for c in list(set(definition)) if c.isalpha()]):
@@ -142,23 +145,36 @@ class DAG:
         return False
 
     # this method creates the moralized DAG starting from the one passed as argument
-    def get_moralized_graph(original_dag):
-        moralized_graph_edges_set = []
+    def get_moralized_dag(self):
+        moralized_graph_edges_set = self.definition.split(',')
         # looping on the transpose of the adjacency matrix to find the unmarried parents in the original DAG
-        for col in original_dag.adjacency_matrix.T:
-            print("wip")
-
-        # crating the moralized DAG
-        moralized_dag = DAG(",".join(moralized_graph_edges_set))
+        for col in self.adjacency_matrix.T:
+            # acting only if the considered node has 2 common parents
+            if Counter(col)[1] >= 2:
+                indeces = [idx for idx, value in enumerate(col) if value == 1]
+                # iterating over all pairs of parents that have a common child
+                for pair in combinations(indeces, 2):
+                    # creating the new edge
+                    new_edge = ""
+                    for node in self.nodes_set:
+                        if node.id == pair[0]:
+                            new_edge += node.variable_name
+                            break
+                    new_edge += "-"
+                    for node in self.nodes_set:
+                        if node.id == pair[1]:
+                            new_edge += node.variable_name
+                            break
+                    if new_edge not in moralized_graph_edges_set:
+                        moralized_graph_edges_set.append(new_edge)
+        # creating the moralized DAG
+        moralized_dag = DAG.create_dag(','.join(moralized_graph_edges_set))
         return moralized_dag
 
-    # this method inverts the specified edge direction
-    def invert_edge(self, starting_node, ending_node):
-        for edge in self.edges_set:
-            if edge.starting_node == starting_node and edge.ending_node == ending_node:
-                edge.starting_node = ending_node
-                edge.ending_node = starting_node
-        return
+
+
+
+
 
 
 #

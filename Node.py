@@ -12,10 +12,7 @@ class Node:
 
     def __str__(self):
         return self.variable_name
-
-    def __repr__(self):
-        return str(self)
-
+        
     def __eq__(self, other):
         return self.variable_name == other.variable_name
 
