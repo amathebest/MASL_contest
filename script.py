@@ -11,13 +11,11 @@ os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz 2.44.1/bin/'
 
 
 definition = "a-b,a-c,a-d,c-b,b-d,a-e,e-d,c-f,b-f"
-dag = DAG(definition)
+dag = DAG.create_dag(definition)
+dag.draw_graph()
+#print(dag.adjacency_matrix)
 
-
-
-
-print(dag.adjacency_matrix)
 
 moralized_dag = dag.get_moralized_dag()
-
-print(moralized_dag.adjacency_matrix)
+moralized_dag.draw_graph()
+#print(moralized_dag.adjacency_matrix)

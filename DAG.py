@@ -118,6 +118,7 @@ class DAG:
         for node in self.nodes_set:
             dot.node(str(node.variable_name), fontname = "consolas")
         # building DAG edges
+        print(self.edges_set)
         for edge in self.edges_set:
             dot.edge(str(edge.starting_node), str(edge.ending_node), fontname = "consolas")
         dot.render(os.path.dirname(os.path.realpath(__file__)) + "DAG", view = True, format = "png")
@@ -145,10 +146,10 @@ class DAG:
         return False
 
     # this method creates the moralized DAG starting from the one passed as argument
-    def get_moralized_dag(self):
-        moralized_graph_edges_set = self.definition.split(',')
+    def get_moralized_dag(original_dag):
+        moralized_graph_edges_set = original_dag.definition.split(',')
         # looping on the transpose of the adjacency matrix to find the unmarried parents in the original DAG
-        for col in self.adjacency_matrix.T:
+        for col in original_dag.adjacency_matrix.T:
             # acting only if the considered node has 2 common parents
             if Counter(col)[1] >= 2:
                 indeces = [idx for idx, value in enumerate(col) if value == 1]
@@ -156,22 +157,30 @@ class DAG:
                 for pair in combinations(indeces, 2):
                     # creating the new edge
                     new_edge = ""
-                    for node in self.nodes_set:
+                    for node in original_dag.nodes_set:
                         if node.id == pair[0]:
                             new_edge += node.variable_name
                             break
                     new_edge += "-"
-                    for node in self.nodes_set:
+                    for node in original_dag.nodes_set:
                         if node.id == pair[1]:
                             new_edge += node.variable_name
                             break
-                    if new_edge not in moralized_graph_edges_set:
-                        moralized_graph_edges_set.append(new_edge)
+                    # adding an undirected edge to the moralized dag definition
+                    DAG.add_undirected_edge(moralized_graph_edges_set, new_edge)
+                    DAG.add_undirected_edge(moralized_graph_edges_set, new_edge[::-1])
+        # converting each directed edge into an undirected one
+        for edge in moralized_graph_edges_set:
+            DAG.add_undirected_edge(moralized_graph_edges_set, edge[::-1])
         # creating the moralized DAG
         moralized_dag = DAG.create_dag(','.join(moralized_graph_edges_set))
         return moralized_dag
 
-
+    # this method adds an undirected edge starting_node-ending_node to the given edges set
+    def add_undirected_edge(edges_set, edge):
+        if edge not in edges_set:
+            edges_set.append(edge)
+        return
 
 
 
