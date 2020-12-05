@@ -1,12 +1,12 @@
 class Edge:
-    id = 0
     starting_node = ""
     ending_node = ""
+    id = 0
 
-    def __init__(self, edge_count, starting_node, ending_node):
-        self.id = edge_count
+    def __init__(self, starting_node, ending_node):
         self.starting_node = starting_node
         self.ending_node = ending_node
+        self.id = 0
 
     def __str__(self):
         return self.starting_node + "-->" + self.ending_node

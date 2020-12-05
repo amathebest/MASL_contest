@@ -35,13 +35,15 @@ class DAG:
 
     # this method creates an instance of the class Node and add it to the nodes set instance variable
     def add_node(self, variable_name):
-        node = Node(len(self.nodes_set), variable_name)
+        node = Node(variable_name)
+        node.id = len(self.nodes_set)
         self.nodes_set.append(node)
         return
 
     # this method creates an instance of the class Edge and add it to the edges set instance variable
     def add_edge(self, starting_node, ending_node):
-        edge = Edge(len(self.edges_set), starting_node, ending_node)
+        edge = Edge(starting_node, ending_node)
+        edge.id = len(self.edges_set)
         self.edges_set.append(edge)
         return
 
@@ -77,38 +79,6 @@ class DAG:
     def get_adjacency_matrix(self):
         return self.adjacency_matrix
 
-    # this method returns the list of the parents of a given node passed as argument
-    def get_parents(self, node):
-        parents = []
-        for edge in self.edges_set:
-            if edge.ending_node == node:
-                parents.append(edge.starting_node)
-        return parents
-
-    # this method returns the list of the children of a given node passed as argument
-    def get_children(self, node):
-        children = []
-        for edge in self.edges_set:
-            if edge.starting_node == node:
-                children.append(edge.ending_node)
-        return children
-
-    # this method returns the list of the ancestors of a given node passed as argument
-    def get_ancestors(self, my_node):
-        ancestors = []
-        for node in self.nodes_set:
-            if self.are_connected(node, my_node):
-                ancestors.append(node)
-        return ancestors
-
-    # this method returns the list of the descendants of a given node passed as argument
-    def get_descendants(self, my_node):
-        descendants = []
-        for node in self.nodes_set:
-            if self.are_connected(my_node, node):
-                descendants.append(node)
-        return descendants
-
     # this method draws the graph based on the type of graph passed as argument
     def draw_graph(self, type):
         # creating the skeleton of the DAG
@@ -123,16 +93,67 @@ class DAG:
         for node in self.nodes_set:
             dot.node(str(node.variable_name), fontname = "consolas")
         # building DAG edges
-        print(self.edges_set)
         for edge in self.edges_set:
             dot.edge(str(edge.starting_node), str(edge.ending_node), fontname = "consolas")
         dot.render(name, view = True, format = "png")
         return
 
+    # this method returns the corresponding node object based on the variable name passed as argument
+    def get_node_by_variable(dag, variable_name):
+        for node in dag.nodes_set:
+            if node.variable_name == variable_name:
+                return node
+
+    # this method returns the corresponding edge object based on the extremes passed as argument
+    def get_edge_by_extremes(dag, starting_node, ending_node):
+        for edge in dag.edges_set:
+            if edge.starting_node == starting_node and edge.ending_node == ending_node:
+                return edge
+
+    # this method returns the list of the parents of a given node passed as argument
+    def get_parents(dag, node):
+        parents = []
+        for edge in dag.edges_set:
+            if edge.ending_node == node:
+                parents.append(edge.starting_node)
+        return parents
+
+    # this method returns the list of the children of a given node passed as argument
+    def get_children(dag, node):
+        children = []
+        for edge in dag.edges_set:
+            if edge.starting_node == node:
+                children.append(edge.ending_node)
+        return children
+
+    # this method returns the list of the ancestors of a given node passed as argument
+    def get_ancestors(dag, my_node):
+        ancestors = []
+        for node in dag.nodes_set:
+            if DAG.are_connected(dag, node.variable_name, my_node):
+                ancestors.append(node)
+        return ancestors
+
+    # this method returns the list of the descendants of a given node passed as argument
+    def get_descendants(dag, my_node):
+        descendants = []
+        for node in dag.nodes_set:
+            if DAG.are_connected(dag, my_node, node.variable_name):
+                descendants.append(node)
+        return descendants
+
+    # this method returns the Markov blanked of a given node passed as argument (parents + children + spouses)
+    def get_Markov_blanket(dag, my_node):
+
+        return
+
     # this method determines if there is a path between the two nodes passed as argument
-    def are_connected(self, node_1, node_2):
+    def are_connected(dag, variable_1, variable_2):
+        # finding the two nodes in the graph
+        node_1 = DAG.get_node_by_variable(dag, variable_1)
+        node_2 = DAG.get_node_by_variable(dag, variable_2)
         # initializing queue to do a Breadth First Search
-        discovered = [False for i in range(len(self.nodes_set))]
+        discovered = [False for i in range(len(dag.nodes_set))]
         bfs_queue = deque()
         # initial condition
         bfs_queue.append(node_1)
@@ -144,7 +165,7 @@ class DAG:
             if node == node_2:
                 return True
             # looping on the adjacent nodes
-            for adjacent in [adj for adj in self.nodes_set if self.adjacency_matrix[node.id][adj.id] == 1]:
+            for adjacent in [adj for adj in dag.nodes_set if dag.adjacency_matrix[node.id][adj.id] == 1]:
                 if not discovered[adjacent.id]:
                     discovered[adjacent.id] = True
                     bfs_queue.append(adjacent) # enqueuing the newly discovered node
