@@ -2,7 +2,7 @@ import os
 import numpy as np
 from itertools import combinations
 from collections import deque, Counter
-from graphviz import Digraph
+from graphviz import Digraph, Graph
 
 from Node import Node
 from Edge import Edge
@@ -28,7 +28,7 @@ class DAG:
         dag = DAG(definition)
         for edge in definition.split(","):
             dag.add_edge(edge.split("-")[0], edge.split("-")[1])
-        for variable in sorted([c for c in list(set(definition)) if c.isalpha()]):
+        for variable in sorted([c for c in list(set(definition)) if c.isalpha() or c.isdigit()]):
             dag.add_node(variable)
         dag.build_adjacency_matrix()
         return dag
@@ -109,10 +109,15 @@ class DAG:
                 descendants.append(node)
         return descendants
 
-    # this method draws the graph
-    def draw_graph(self):
+    # this method draws the graph based on the type of graph passed as argument
+    def draw_graph(self, type):
         # creating the skeleton of the DAG
-        dot = Digraph(comment = "DAG")
+        if type == "directed":
+            dot = Digraph(comment = "DAG")
+            name = os.path.dirname(os.path.realpath(__file__)) + "DAG"
+        else:
+            dot = Graph(comment = "Moralized DAG")
+            name = os.path.dirname(os.path.realpath(__file__)) + "Moralized_DAG"
         dot.graph_attr['Gdpi'] = '1000'
         # building DAG nodes
         for node in self.nodes_set:
@@ -121,7 +126,7 @@ class DAG:
         print(self.edges_set)
         for edge in self.edges_set:
             dot.edge(str(edge.starting_node), str(edge.ending_node), fontname = "consolas")
-        dot.render(os.path.dirname(os.path.realpath(__file__)) + "DAG", view = True, format = "png")
+        dot.render(name, view = True, format = "png")
         return
 
     # this method determines if there is a path between the two nodes passed as argument
@@ -172,6 +177,10 @@ class DAG:
         # converting each directed edge into an undirected one
         for edge in moralized_graph_edges_set:
             DAG.add_undirected_edge(moralized_graph_edges_set, edge[::-1])
+        # removing duplicated edges
+        for edge in moralized_graph_edges_set:
+            if edge[::-1] in moralized_graph_edges_set:
+                moralized_graph_edges_set.remove(edge[::-1])
         # creating the moralized DAG
         moralized_dag = DAG.create_dag(','.join(moralized_graph_edges_set))
         return moralized_dag
