@@ -24,9 +24,11 @@ class Node:
     def __hash__(self):
         return self.id
 
+    # this method sets as root the given node
     def set_as_root(self):
         self.isRoot = True
 
+    # this method sets as leaf the given node
     def set_as_leaf(self):
         self.isLeaf = True
 

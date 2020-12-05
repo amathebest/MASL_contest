@@ -19,6 +19,10 @@ class Edge:
     def __eq__(self, other):
         return self.starting_node == other.starting_node and self.ending_node == other.ending_node
 
+    # this method returns a version of the reversed edge
+    def reverse(self):
+        return Edge(self.ending_node, self.starting_node, self.type)
+
     # this method returns the corresponding edge object based on the extremes passed as argument
     def get_edge_by_extremes(dag, starting_node, ending_node):
         for edge in dag.edges_set:

@@ -38,10 +38,12 @@ class Dag:
     # this method creates the DAG based on the definition passed as argument
     def create_dag(definition, type = "directed"):
         dag = Dag(definition)
+        # DAG filling
         for edge in definition.split(","):
             dag.add_edge(edge.split("-")[0], edge.split("-")[1], type)
         for variable in sorted([c for c in list(set(definition)) if c.isalpha() or c.isdigit()]):
             dag.add_node(variable)
+        # building the adjacency matrix of the DAG
         dag.build_adjacency_matrix()
         return dag
 
@@ -53,10 +55,12 @@ class Dag:
         return
 
     # this method creates an instance of the class Edge and add it to the edges set instance variable
+    # depending on the type passed as argument (directed/undirected)
     def add_edge(self, starting_node, ending_node, type):
         edge = Edge(starting_node, ending_node, type)
         edge.id = len(self.edges_set)
-        self.edges_set.append(edge)
+        if type == "directed" or type == "undirected" and edge.reverse() not in self.edges_set:
+            self.edges_set.append(edge)
         return
 
     # this method creates the adjacency matrix for the given DAG
@@ -124,10 +128,10 @@ class Dag:
                         moralized_dag_definition.append(new_edge)
                     if new_edge[::-1] not in moralized_dag_definition:
                         moralized_dag_definition.append(new_edge[::-1])
-        # removing duplicated edges
+        # adding the reverse version of each edge if not present
         for edge in moralized_dag_definition:
-            if edge[::-1] in moralized_dag_definition:
-                moralized_dag_definition.remove(edge[::-1])
+            if edge[::-1] not in moralized_dag_definition:
+                moralized_dag_definition.append(edge[::-1])
         # creating the moralized version of the DAG
         moralized_dag = Dag.create_dag(','.join(moralized_dag_definition), "undirected")
         return moralized_dag
