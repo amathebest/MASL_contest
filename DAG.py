@@ -98,6 +98,12 @@ class DAG:
         dot.render(name, view = True, format = "png")
         return
 
+    # this method returns the corresponding node object based on the id passed as argument
+    def get_node_by_id(dag, node_id):
+        for node in dag.nodes_set:
+            if node.id == node_id:
+                return node
+
     # this method returns the corresponding node object based on the variable name passed as argument
     def get_node_by_variable(dag, variable_name):
         for node in dag.nodes_set:
@@ -115,7 +121,7 @@ class DAG:
         parents = []
         for edge in dag.edges_set:
             if edge.ending_node == node:
-                parents.append(edge.starting_node)
+                parents.append(DAG.get_node_by_variable(dag, edge.starting_node))
         return parents
 
     # this method returns the list of the children of a given node passed as argument
@@ -123,7 +129,7 @@ class DAG:
         children = []
         for edge in dag.edges_set:
             if edge.starting_node == node:
-                children.append(edge.ending_node)
+                children.append(DAG.get_node_by_variable(dag, edge.ending_node))
         return children
 
     # this method returns the list of the ancestors of a given node passed as argument
@@ -142,10 +148,27 @@ class DAG:
                 descendants.append(node)
         return descendants
 
-    # this method returns the Markov blanked of a given node passed as argument (parents + children + spouses)
-    def get_Markov_blanket(dag, my_node):
+    # this method returns the list of parents that share common children with the node passed as argument
+    def get_spouses(dag, variable_name):
+        # finding the node in the graph
+        my_node = DAG.get_node_by_variable(dag, variable_name)
+        # building the set of common spouses (parents of common children)
+        spouses_idx = []
+        # looping on the trasposed adjacency matrix to find all the children that have common parents with the given node
+        for col in dag.adjacency_matrix.T:
+            if col[my_node.id] == 1:
+                for idx, other in enumerate(col):
+                    if other == 1 and idx != my_node.id:
+                        spouses_idx.append(idx)
+        # turning each index into their corresponding node
+        spouses = []
+        for index in spouses_idx:
+            spouses.append(DAG.get_node_by_id(dag, index))
+        return spouses
 
-        return
+    # this method returns the Markov blanked of a given node passed as argument (parents + children + spouses)
+    def get_Markov_blanket(dag, variable_name):
+        return set(DAG.get_parents(dag, variable_name) + DAG.get_children(dag, variable_name) + DAG.get_spouses(dag, variable_name))
 
     # this method determines if there is a path between the two nodes passed as argument
     def are_connected(dag, variable_1, variable_2):
