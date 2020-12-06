@@ -59,8 +59,7 @@ class Dag:
     def add_edge(self, starting_node, ending_node, type):
         edge = Edge(starting_node, ending_node, type)
         edge.id = len(self.edges_set)
-        if type == "directed" or type == "undirected" and edge.reverse() not in self.edges_set:
-            self.edges_set.append(edge)
+        self.edges_set.append(edge)
         return
 
     # this method creates the adjacency matrix for the given DAG
@@ -89,16 +88,26 @@ class Dag:
         if type == "directed":
             dot = Digraph(comment = "DAG")
             name = os.path.dirname(os.path.realpath(__file__)) + "DAG"
+            dot.graph_attr['Gdpi'] = '1000'
+            # building DAG nodes
+            for node in self.nodes_set:
+                dot.node(str(node.variable_name), fontname = "consolas")
+            # building DAG edges
+            for edge in self.edges_set:
+                dot.edge(str(edge.starting_node), str(edge.ending_node), fontname = "consolas")
         else:
             dot = Graph(comment = "Moralized DAG")
             name = os.path.dirname(os.path.realpath(__file__)) + "Moralized_DAG"
-        dot.graph_attr['Gdpi'] = '1000'
-        # building DAG nodes
-        for node in self.nodes_set:
-            dot.node(str(node.variable_name), fontname = "consolas")
-        # building DAG edges
-        for edge in self.edges_set:
-            dot.edge(str(edge.starting_node), str(edge.ending_node), fontname = "consolas")
+            dot.graph_attr['Gdpi'] = '1000'
+            # building DAG nodes
+            for node in self.nodes_set:
+                dot.node(str(node.variable_name), fontname = "consolas")
+            # building DAG edges
+            edges_already_drawn = []
+            for edge in self.edges_set:
+                if edge.reverse() not in edges_already_drawn:
+                    dot.edge(str(edge.starting_node), str(edge.ending_node), fontname = "consolas")
+                    edges_already_drawn.append(edge)
         dot.render(name, view = True, format = "png")
         return
 
@@ -135,5 +144,11 @@ class Dag:
         # creating the moralized version of the DAG
         moralized_dag = Dag.create_dag(','.join(moralized_dag_definition), "undirected")
         return moralized_dag
+
+    # this method returns the cliques found in the given moralized DAG (or in general in the given
+    # undirected graph)
+    def get_cliques(moralized_dag):
+
+        return
 
 #

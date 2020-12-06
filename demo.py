@@ -56,7 +56,7 @@ dag.draw_graph("directed")
 # DAG moralization
 moralized_dag = dag.get_moralized_dag()
 moralized_dag.draw_graph("undirected")
-
+print(moralized_dag.get_adjacency_matrix())
 
 
 #
