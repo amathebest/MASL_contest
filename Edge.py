@@ -11,7 +11,7 @@ class Edge:
         self.id = 0
 
     def __str__(self):
-        return self.starting_node + "-->" + self.ending_node
+        return self.starting_node + "-" + self.ending_node
 
     def __repr__(self):
         return str(self)

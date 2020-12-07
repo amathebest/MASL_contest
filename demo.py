@@ -1,13 +1,25 @@
 # libraries import
 import os
-from DagUtils import Dag, Node, Edge
+from DagUtils import Dag
+from Node import Node
+from Edge import Edge
 
 # environment variable for the Graphviz library
 os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz 2.44.1/bin/'
 
 # DAG creation
-definition = "1-2,1-3,2-4,2-5,3-5,3-6,4-7,5-7,5-6,6-7"
+#definition = "1-2,1-3,2-4,2-5,3-5,3-6,4-7,5-7,5-6,6-7"
+definition = "1-2,1-3,3-2,2-4,1-5,5-4,3-6,2-6"
 dag = Dag.create_dag(definition)
+
+
+print("##### TESTING #####")
+v = "1"
+n = dag.nodes_set[0]
+anc0 = Dag.get_ancestral_subgraph(dag, n)
+
+print("##### TESTING #####")
+
 
 # testing of the instance methods
 print("Nodes in the DAG:")
@@ -45,7 +57,7 @@ print("Markov Blanket of " + node_markov_blanket_test + ":")
 print(Node.get_Markov_blanket(dag, node_markov_blanket_test))
 
 node_connection_test_1 = '1'
-node_connection_test_2 = '7'
+node_connection_test_2 = '6'
 print("Are " + node_connection_test_1 + " and " + node_connection_test_2 + " connected?")
 print(Node.are_connected(dag, node_connection_test_1, node_connection_test_2))
 

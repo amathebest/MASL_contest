@@ -45,10 +45,17 @@ class Node:
                 return node
 
     # this method determines if there is a path between the two nodes passed as argument
+    # the node can be passed both in form of a string (variable name) and node itself
     def are_connected(dag, variable_1, variable_2):
-        # finding the two nodes in the graph
-        node_1 = Node.get_node_by_variable(dag, variable_1)
-        node_2 = Node.get_node_by_variable(dag, variable_2)
+        node_1 = None
+        node_2 = None
+        if isinstance(variable_1, str) and isinstance(variable_2, str):
+            # finding the two nodes in the graph
+            node_1 = Node.get_node_by_variable(dag, variable_1)
+            node_2 = Node.get_node_by_variable(dag, variable_2)
+        else:
+            node_1 = variable_1
+            node_2 = variable_2
         # initializing queue to do a Breadth First Search
         discovered = [False for i in range(len(dag.nodes_set))]
         bfs_queue = deque()
@@ -69,38 +76,63 @@ class Node:
         return False
 
     # this method returns the list of the parents of a given node passed as argument
-    def get_parents(dag, node):
+    # the node can be passed both in form of a string (variable name) and node itself
+    def get_parents(dag, variable):
+        my_node = None
+        if isinstance(variable, str):
+            my_node = Node.get_node_by_variable(dag, variable)
+        else:
+            my_node = variable
         parents = []
         for edge in dag.edges_set:
-            if edge.ending_node == node:
+            if edge.ending_node == my_node.variable_name:
                 parents.append(Node.get_node_by_variable(dag, edge.starting_node))
         return parents
 
     # this method returns the list of the children of a given node passed as argument
-    def get_children(dag, node):
+    # the node can be passed both in form of a string (variable name) and node itself
+    def get_children(dag, variable):
+        my_node = None
+        if isinstance(variable, str):
+            my_node = Node.get_node_by_variable(dag, variable)
+        else:
+            my_node = variable
         children = []
         for edge in dag.edges_set:
-            if edge.starting_node == node:
+            if edge.starting_node == my_node.variable_name:
                 children.append(Node.get_node_by_variable(dag, edge.ending_node))
         return children
 
     # this method returns the list of the ancestors of a given node passed as argument
-    def get_ancestors(dag, my_node):
+    # the node can be passed both in form of a string (variable name) and node itself
+    def get_ancestors(dag, variable):
+        my_node = None
+        if isinstance(variable, str):
+            my_node = Node.get_node_by_variable(dag, variable)
+        else:
+            my_node = variable
         ancestors = []
         for node in dag.nodes_set:
-            if Node.are_connected(dag, node.variable_name, my_node):
+            if Node.are_connected(dag, node, my_node):
                 ancestors.append(node)
         return ancestors
 
     # this method returns the list of the descendants of a given node passed as argument
-    def get_descendants(dag, my_node):
+    # the node can be passed both in form of a string (variable name) and node itself
+    def get_descendants(dag, variable):
+        my_node = None
+        if isinstance(variable, str):
+            my_node = Node.get_node_by_variable(dag, variable)
+        else:
+            my_node = variable
         descendants = []
         for node in dag.nodes_set:
-            if Node.are_connected(dag, my_node, node.variable_name):
+            if Node.are_connected(dag, my_node, node):
                 descendants.append(node)
         return descendants
 
     # this method returns the list of parents that share common children with the node passed as argument
+    # the node can be passed both in form of a string (variable name) and node itself
     def get_spouses(dag, variable_name):
         # finding the node in the graph
         my_node = Node.get_node_by_variable(dag, variable_name)
@@ -119,5 +151,28 @@ class Node:
         return spouses
 
     # this method returns the Markov blanked of a given node passed as argument (parents + children + spouses)
+    # the node can be passed both in form of a string (variable name) and node itself
     def get_Markov_blanket(dag, variable_name):
         return set(Node.get_parents(dag, variable_name) + Node.get_children(dag, variable_name) + Node.get_spouses(dag, variable_name))
+
+    # this method checks independency between the nodes passed as argument:
+    # set_a = set of nodes to check independecy from set_b
+    # set_given = optional set of nodes that will be the set of nodes which will be the conditioning nodes of the independency
+    def check_independency(set_a, set_b, set_given = []):
+        # collecting nodes from the set of variable names in set_a
+        set_a_nodes = []
+        for node_variable in set_a:
+            set_a_nodes.get_node_by_variable(node_variable)
+        # collecting nodes from the set of variable names in set_a
+        set_b_nodes = []
+        for node_variable in set_b:
+            set_b_nodes.get_node_by_variable(node_variable)
+        # collecting nodes from the set of variable names in set_a
+        set_given_nodes = []
+        for node_variable in set_given:
+            set_given_nodes.get_node_by_variable(node_variable)
+
+        if len(set_a_nodes) == len(set_b_nodes) == 1:
+            print("wip")
+
+        return

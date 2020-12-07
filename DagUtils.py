@@ -122,16 +122,7 @@ class Dag:
                 # iterating over all pairs of parents that have a common child
                 for pair in combinations(indeces, 2):
                     # creating the new edge
-                    new_edge = ""
-                    for node in dag.nodes_set:
-                        if node.id == pair[0]:
-                            new_edge += node.variable_name
-                            break
-                    new_edge += "-"
-                    for node in dag.nodes_set:
-                        if node.id == pair[1]:
-                            new_edge += node.variable_name
-                            break
+                    new_edge = Node.get_node_by_variable(dag, pair[0]).variable_name + "-" + Node.get_node_by_variable(dag, pair[1]).variable_name
                     # adding an undirected edge to the moralized dag definition
                     if new_edge not in moralized_dag_definition:
                         moralized_dag_definition.append(new_edge)
@@ -144,6 +135,17 @@ class Dag:
         # creating the moralized version of the DAG
         moralized_dag = Dag.create_dag(','.join(moralized_dag_definition), "undirected")
         return moralized_dag
+
+    # this method returns the ancestral subgraph of the given node or set of nodes
+    def get_ancestral_subgraph(dag, nodes_set):
+        ancestral_subgraph_definition = ''
+        ancestral_set = Node.get_ancestors(dag, nodes_set)
+        for edge in dag.edges_set:
+            if Node.get_node_by_variable(dag, edge.starting_node) in ancestral_set and Node.get_node_by_variable(dag, edge.ending_node) in ancestral_set:
+                ancestral_subgraph_definition += edge.starting_node + "-" + edge.ending_node + ","
+        print(ancestral_subgraph_definition)
+        ancestral_subgraph = Dag.create_dag(','.join(ancestral_subgraph_definition), "directed")
+        return ancestral_subgraph
 
     # this method returns the cliques found in the given moralized DAG (or in general in the given
     # undirected graph)
