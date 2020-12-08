@@ -9,18 +9,13 @@ os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz 2.44.1/bin/'
 
 # DAG creation
 #definition = "1-2,1-3,2-4,2-5,3-5,3-6,4-7,5-7,5-6,6-7"
-definition = "0-1,0-2,2-1,1-3,0-4,4-3,2-5,1-5"
+definition = "0-1,0-2,2-1,1-3,0-4,4-3,2-5,1-5,4-5,1-6,2-7,3-6,1-8,6-9"
 dag = Dag.create_dag(definition)
 
 
 print("##### TESTING #####")
-v = "1"
-arr = []
-arr.append(dag.nodes_set[0])
-arr.append(dag.nodes_set[3])
-anc0 = Dag.get_ancestral_subgraph(dag, arr)
-print(anc0.get_edges())
-anc0.draw_graph("directed", "Ancestral DAG")
+
+
 print("##### TESTING #####")
 
 
@@ -35,7 +30,7 @@ print("Adjacency matrix:")
 print(dag.get_adjacency_matrix())
 
 # testing of the other methods
-node_parents_test = '2'
+node_parents_test = '5'
 print("Parents of " + node_parents_test + ":")
 print(Node.get_parents(dag, node_parents_test))
 
@@ -72,6 +67,11 @@ dag.draw_graph("directed", "DAG")
 moralized_dag = dag.get_moralized_dag()
 #moralized_dag.draw_graph("undirected", "Moralized DAG")
 print(moralized_dag.get_adjacency_matrix())
+
+# ancestral graph
+anc0 = Dag.get_ancestral_subgraph(dag, ['0', '1', '2', '4', '6'])
+#anc0.draw_graph("directed", "ancestral_DAG")
+print(anc0.get_adjacency_matrix())
 
 
 #

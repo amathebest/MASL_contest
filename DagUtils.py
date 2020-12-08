@@ -84,10 +84,10 @@ class Dag:
 
     # this method draws the graph based on the type of graph passed as argument
     def draw_graph(self, type, comment):
+        name = os.path.dirname(os.path.realpath(__file__)) + "_" + comment
         # creating the skeleton of the DAG
         if type == "directed":
             dot = Digraph(comment = comment)
-            name = os.path.dirname(os.path.realpath(__file__)) + "DAG"
             dot.graph_attr['Gdpi'] = '1000'
             # building DAG nodes
             for node in self.nodes_set:
@@ -98,7 +98,6 @@ class Dag:
             dot.render(name, view = True, format = "png")
         else:
             dot = Graph(comment = comment)
-            name = os.path.dirname(os.path.realpath(__file__)) + "Moralized_DAG"
             dot.graph_attr['Gdpi'] = '1000'
             # building DAG nodes
             for node in self.nodes_set:
