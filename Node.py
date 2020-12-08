@@ -1,5 +1,7 @@
 from collections import deque
 
+from GraphUtils import Graph
+
 class Node:
     variable_name = ''
     id = 0
@@ -184,5 +186,15 @@ class Node:
 
         if len(set_a_nodes) == len(set_b_nodes) == 1:
             print("wip")
-
+        #####
+        # per checkare indipendenza, formare l'ancestral graph a partire dall'insieme dei nodes passati come argomento
+        # una volta costruito l'ancestral graph costruire la versione moralized
+        # una volta costruta la versione moralized checkare:
+        # - se set_given è empty allora siamo in ambito marginal independence:
+        #   se esiste un path in moralized(ancestral) che collega set_a con set_b allora set_a e set_b sono solo conditionally independent l'uno con l'altro
+        #   altrimenti se non esiste un path in moralized(ancestral) che collega set_a con set_b allora set_a e set_b sono marginally independent
+        # - se set_given non è empty allora verificare se c'è i nodi contenuti in set_given separano i nodi del set_a dai nodi del set_b nel moralized(ancestral):
+        #   se ogni path passa per i nodi che sono in set_given allora la verifica ritorna true
+        #   altrimenti se c'è anche solo un path che passa per un nodo che non è in set_given la verifica ritorna false
+        #####
         return
