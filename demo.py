@@ -9,15 +9,18 @@ os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz 2.44.1/bin/'
 
 # DAG creation
 #definition = "1-2,1-3,2-4,2-5,3-5,3-6,4-7,5-7,5-6,6-7"
-definition = "1-2,1-3,3-2,2-4,1-5,5-4,3-6,2-6"
+definition = "0-1,0-2,2-1,1-3,0-4,4-3,2-5,1-5"
 dag = Dag.create_dag(definition)
 
 
 print("##### TESTING #####")
 v = "1"
-n = dag.nodes_set[0]
-anc0 = Dag.get_ancestral_subgraph(dag, n)
-
+arr = []
+arr.append(dag.nodes_set[0])
+arr.append(dag.nodes_set[3])
+anc0 = Dag.get_ancestral_subgraph(dag, arr)
+print(anc0.get_edges())
+anc0.draw_graph("directed", "Ancestral DAG")
 print("##### TESTING #####")
 
 
@@ -32,7 +35,7 @@ print("Adjacency matrix:")
 print(dag.get_adjacency_matrix())
 
 # testing of the other methods
-node_parents_test = '6'
+node_parents_test = '2'
 print("Parents of " + node_parents_test + ":")
 print(Node.get_parents(dag, node_parents_test))
 
@@ -57,17 +60,17 @@ print("Markov Blanket of " + node_markov_blanket_test + ":")
 print(Node.get_Markov_blanket(dag, node_markov_blanket_test))
 
 node_connection_test_1 = '1'
-node_connection_test_2 = '6'
+node_connection_test_2 = '5'
 print("Are " + node_connection_test_1 + " and " + node_connection_test_2 + " connected?")
 print(Node.are_connected(dag, node_connection_test_1, node_connection_test_2))
 
 # DAG visualization
 print("Drawing the DAG...")
-dag.draw_graph("directed")
+dag.draw_graph("directed", "DAG")
 
 # DAG moralization
 moralized_dag = dag.get_moralized_dag()
-moralized_dag.draw_graph("undirected")
+#moralized_dag.draw_graph("undirected", "Moralized DAG")
 print(moralized_dag.get_adjacency_matrix())
 
 

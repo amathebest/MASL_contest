@@ -78,6 +78,7 @@ class Node:
     # this method returns the list of the parents of a given node passed as argument
     # the node can be passed both in form of a string (variable name) and node itself
     def get_parents(dag, variable):
+        # finding the node in the graph
         my_node = None
         if isinstance(variable, str):
             my_node = Node.get_node_by_variable(dag, variable)
@@ -92,6 +93,7 @@ class Node:
     # this method returns the list of the children of a given node passed as argument
     # the node can be passed both in form of a string (variable name) and node itself
     def get_children(dag, variable):
+        # finding the node in the graph
         my_node = None
         if isinstance(variable, str):
             my_node = Node.get_node_by_variable(dag, variable)
@@ -106,6 +108,7 @@ class Node:
     # this method returns the list of the ancestors of a given node passed as argument
     # the node can be passed both in form of a string (variable name) and node itself
     def get_ancestors(dag, variable):
+        # finding the node in the graph
         my_node = None
         if isinstance(variable, str):
             my_node = Node.get_node_by_variable(dag, variable)
@@ -120,6 +123,7 @@ class Node:
     # this method returns the list of the descendants of a given node passed as argument
     # the node can be passed both in form of a string (variable name) and node itself
     def get_descendants(dag, variable):
+        # finding the node in the graph
         my_node = None
         if isinstance(variable, str):
             my_node = Node.get_node_by_variable(dag, variable)
@@ -133,9 +137,13 @@ class Node:
 
     # this method returns the list of parents that share common children with the node passed as argument
     # the node can be passed both in form of a string (variable name) and node itself
-    def get_spouses(dag, variable_name):
+    def get_spouses(dag, variable):
         # finding the node in the graph
-        my_node = Node.get_node_by_variable(dag, variable_name)
+        my_node = None
+        if isinstance(variable, str):
+            my_node = Node.get_node_by_variable(dag, variable)
+        else:
+            my_node = variable
         # building the set of common spouses (parents of common children)
         spouses_idx = []
         # looping on the trasposed adjacency matrix to find all the children that have common parents with the given node
@@ -152,8 +160,14 @@ class Node:
 
     # this method returns the Markov blanked of a given node passed as argument (parents + children + spouses)
     # the node can be passed both in form of a string (variable name) and node itself
-    def get_Markov_blanket(dag, variable_name):
-        return set(Node.get_parents(dag, variable_name) + Node.get_children(dag, variable_name) + Node.get_spouses(dag, variable_name))
+    def get_Markov_blanket(dag, variable):
+        # finding the node in the graph
+        my_node = None
+        if isinstance(variable, str):
+            my_node = Node.get_node_by_variable(dag, variable)
+        else:
+            my_node = variable
+        return set(Node.get_parents(dag, my_node) + Node.get_children(dag, my_node) + Node.get_spouses(dag, my_node))
 
     # this method checks independency between the nodes passed as argument:
     # set_a = set of nodes to check independecy from set_b

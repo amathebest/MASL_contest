@@ -83,10 +83,10 @@ class Dag:
         return
 
     # this method draws the graph based on the type of graph passed as argument
-    def draw_graph(self, type):
+    def draw_graph(self, type, comment):
         # creating the skeleton of the DAG
         if type == "directed":
-            dot = Digraph(comment = "DAG")
+            dot = Digraph(comment = comment)
             name = os.path.dirname(os.path.realpath(__file__)) + "DAG"
             dot.graph_attr['Gdpi'] = '1000'
             # building DAG nodes
@@ -95,8 +95,9 @@ class Dag:
             # building DAG edges
             for edge in self.edges_set:
                 dot.edge(str(edge.starting_node), str(edge.ending_node), fontname = "consolas")
+            dot.render(name, view = True, format = "png")
         else:
-            dot = Graph(comment = "Moralized DAG")
+            dot = Graph(comment = comment)
             name = os.path.dirname(os.path.realpath(__file__)) + "Moralized_DAG"
             dot.graph_attr['Gdpi'] = '1000'
             # building DAG nodes
@@ -108,7 +109,7 @@ class Dag:
                 if edge.reverse() not in edges_already_drawn:
                     dot.edge(str(edge.starting_node), str(edge.ending_node), fontname = "consolas")
                     edges_already_drawn.append(edge)
-        dot.render(name, view = True, format = "png")
+            dot.render(name, view = True, format = "png")
         return
 
     # this method creates the moralized DAG starting from the one passed as argument
@@ -122,7 +123,7 @@ class Dag:
                 # iterating over all pairs of parents that have a common child
                 for pair in combinations(indeces, 2):
                     # creating the new edge
-                    new_edge = Node.get_node_by_variable(dag, pair[0]).variable_name + "-" + Node.get_node_by_variable(dag, pair[1]).variable_name
+                    new_edge = Node.get_node_by_variable(dag, str(pair[0])).variable_name + "-" + Node.get_node_by_variable(dag, str(pair[1])).variable_name
                     # adding an undirected edge to the moralized dag definition
                     if new_edge not in moralized_dag_definition:
                         moralized_dag_definition.append(new_edge)
@@ -138,12 +139,17 @@ class Dag:
 
     # this method returns the ancestral subgraph of the given node or set of nodes
     def get_ancestral_subgraph(dag, nodes_set):
-        ancestral_subgraph_definition = ''
-        ancestral_set = Node.get_ancestors(dag, nodes_set)
+        # identifying which nodes will take part in the ancestral graph construction
+        ancestral_set = []
+        for node in nodes_set:
+            ancestral_set += Node.get_ancestors(dag, node)
+        ancestral_set = list(set(ancestral_set))
+        # building the ancestral graph definition
+        ancestral_subgraph_definition = []
         for edge in dag.edges_set:
             if Node.get_node_by_variable(dag, edge.starting_node) in ancestral_set and Node.get_node_by_variable(dag, edge.ending_node) in ancestral_set:
-                ancestral_subgraph_definition += edge.starting_node + "-" + edge.ending_node + ","
-        print(ancestral_subgraph_definition)
+                ancestral_subgraph_definition.append(edge.starting_node + "-" + edge.ending_node)
+        # creating the ancestral graph
         ancestral_subgraph = Dag.create_dag(','.join(ancestral_subgraph_definition), "directed")
         return ancestral_subgraph
 
