@@ -145,17 +145,13 @@ class Node:
         else:
             my_node = variable
         # building the set of common spouses (parents of common children)
-        spouses_idx = []
+        spouses = []
         # looping on the trasposed adjacency matrix to find all the children that have common parents with the given node
         for col in dag.adjacency_matrix.T:
             if col[my_node.id] == 1:
                 for idx, other in enumerate(col):
                     if other == 1 and idx != my_node.id:
-                        spouses_idx.append(idx)
-        # turning each index into their corresponding node
-        spouses = []
-        for index in spouses_idx:
-            spouses.append(Node.get_node_by_id(dag, index))
+                        spouses.append(Node.get_node_by_id(dag, idx))
         return spouses
 
     # this method returns the Markov blanked of a given node passed as argument (parents + children + spouses)
