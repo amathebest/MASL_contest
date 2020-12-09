@@ -4,12 +4,14 @@ from GraphUtils import Graph
 
 class Node:
     variable_name = ''
+    adjacency_list = []
     id = 0
     isRoot = False
     isLeaf = False
 
     def __init__(self, variable_name):
         self.variable_name = variable_name
+        self.adjacency_list = []
         self.id = 0
         self.isRoot = False
         self.isLeaf = False
@@ -48,7 +50,10 @@ class Node:
 
     # this method determines if there is a path between the two nodes passed as argument
     # the node can be passed both in form of a string (variable name) and node itself
-    def are_connected(dag, variable_1, variable_2):
+    # this method checks also if a node within the sets of conditions is passed while going
+    # from the first node to the second one
+    def are_connected(dag, variable_1, variable_2, condition = None):
+        found_condition = False
         node_1 = None
         node_2 = None
         if isinstance(variable_1, str) and isinstance(variable_2, str):
@@ -67,8 +72,12 @@ class Node:
         # looping until the queue is empty
         while bfs_queue:
             node = bfs_queue.popleft()
+            # checking if we found the conditioning node
+            if condition is not None:
+                if node == condition:
+                    found_condition = True
             # stopping if the searched node is found
-            if node == node_2:
+            if node == node_2 and (condition is not None and found_condition or condition is None):
                 return True
             # looping on the adjacent nodes
             for adjacent in [adj for adj in dag.nodes_set if dag.adjacency_matrix[node.id][adj.id] == 1]:
@@ -170,22 +179,34 @@ class Node:
     # this method checks independency between the nodes passed as argument:
     # set_a = set of nodes to check independecy from set_b
     # set_given = optional set of nodes that will be the set of nodes which will be the conditioning nodes of the independency
-    def check_independency(set_a, set_b, set_given = []):
+    def check_independency(dag, set_a_nodes, set_b_nodes, set_given_nodes = []):
         # collecting nodes from the set of variable names in set_a
-        set_a_nodes = []
-        for node_variable in set_a:
-            set_a_nodes.get_node_by_variable(node_variable)
-        # collecting nodes from the set of variable names in set_a
-        set_b_nodes = []
-        for node_variable in set_b:
-            set_b_nodes.get_node_by_variable(node_variable)
-        # collecting nodes from the set of variable names in set_a
-        set_given_nodes = []
-        for node_variable in set_given:
-            set_given_nodes.get_node_by_variable(node_variable)
 
-        if len(set_a_nodes) == len(set_b_nodes) == 1:
-            print("wip")
+        # building the ancestral DAG composed only by the ancestors of the given nodes sets
+        anc = dag.get_ancestral_subgraph(set_a_nodes + set_b_nodes + set_given_nodes)
+        # building the moralized DAG of the ancestral DAG
+        moral = anc.get_moralized_dag()
+        # distinguish between the marginal independence or the conditional independence
+        checks = len(set_a_nodes) * len(set_b_nodes)
+        if not set_given_nodes: # if set_given is empty --> marginal independence
+            print("marginal independence")
+            for node_a in set_a_nodes:
+                for node_b in set_b_nodes:
+                    if moral.adjacency_matrix[node_a.id][node_b.id] == 1: # qui convertire in adjacency list perché sennò va out of bound perché ancestral è un sottografo di original_dag
+                        checks -= 1
+        else: # if set_given is not empty --> conditional independence
+            print("conditional independence")
+            for node_a in set_a_nodes:
+                for node_b in set_b_nodes:
+                    for condition in set_given_nodes:
+                        if are_connected(dag, node_a, node_b, condition):
+                            check -= 1
+        if checks == 0:
+            return True
+        else:
+            return False
+
+
         #####
         # per checkare indipendenza, formare l'ancestral graph a partire dall'insieme dei nodes passati come argomento
         # una volta costruito l'ancestral graph costruire la versione moralized
@@ -197,4 +218,3 @@ class Node:
         #   se ogni path passa per i nodi che sono in set_given allora la verifica ritorna true
         #   altrimenti se c'è anche solo un path che passa per un nodo che non è in set_given la verifica ritorna false
         #####
-        return

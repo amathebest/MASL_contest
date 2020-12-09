@@ -126,7 +126,7 @@ class Graph:
                 # iterating over all pairs of parents that have a common child
                 for pair in combinations(indeces, 2):
                     # creating the new edge
-                    new_edge = Node.get_node_by_variable(self, str(pair[0])).variable_name + "-" + Node.get_node_by_variable(self, str(pair[1])).variable_name
+                    new_edge = Node.get_node_by_id(self, pair[0]).variable_name + "-" + Node.get_node_by_id(self, pair[1]).variable_name
                     # adding an undirected edge to the moralized dag definition
                     if new_edge not in moralized_dag_definition:
                         moralized_dag_definition.append(new_edge)
