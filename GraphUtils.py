@@ -1,8 +1,8 @@
 import os
 import numpy as np
+import graphviz as gv
 from itertools import combinations
 from collections import Counter
-from graphviz import Digraph, Graph
 
 from Node import Node
 from Edge import Edge
@@ -93,7 +93,7 @@ class Graph:
         name = os.path.dirname(os.path.realpath(__file__)) + "_" + comment
         # creating the skeleton of the DAG
         if type == "directed":
-            dot = Digraph(comment = comment)
+            dot = gv.Digraph(comment = comment)
             dot.graph_attr['Gdpi'] = '1000'
             # building DAG nodes
             for node in self.nodes_set:
@@ -103,7 +103,7 @@ class Graph:
                 dot.edge(str(edge.starting_node), str(edge.ending_node), fontname = "consolas")
             dot.render(name, view = True, format = "png")
         else:
-            dot = Graph(comment = comment)
+            dot = gv.Graph()
             dot.graph_attr['Gdpi'] = '1000'
             # building DAG nodes
             for node in self.nodes_set:

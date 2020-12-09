@@ -18,15 +18,17 @@ ug = Graph.create_graph(definition, "undirected")
 testing = True
 if testing:
     set_a = []
-    n1 = Node.get_node_by_variable(dag, 'b')
+    n1 = Node.get_node_by_variable(dag, 'd')
+    n11 = Node.get_node_by_variable(dag, 'e')
     set_a.append(n1)
+    set_a.append(n11)
 
     set_b = []
-    n2 = Node.get_node_by_variable(dag, 'e')
+    n2 = Node.get_node_by_variable(dag, 'b')
     set_b.append(n2)
 
     set_given = []
-    n3 = Node.get_node_by_variable(dag, 'a')
+    n3 = Node.get_node_by_variable(dag, 'c')
     set_given.append(n3)
     print(Node.check_independency(dag, set_a, set_b, set_given))
 else:
