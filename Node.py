@@ -186,20 +186,22 @@ class Node:
         anc = dag.get_ancestral_subgraph(set_a_nodes + set_b_nodes + set_given_nodes)
         # building the moralized DAG of the ancestral DAG
         moral = anc.get_moralized_dag()
+        moral.draw_graph("directed", "test")
         # distinguish between the marginal independence or the conditional independence
-        checks = len(set_a_nodes) * len(set_b_nodes)
+        checks = max(len(set_a_nodes) * len(set_b_nodes), 2)
         if not set_given_nodes: # if set_given is empty --> marginal independence
             print("marginal independence")
             for node_a in set_a_nodes:
                 for node_b in set_b_nodes:
-                    if moral.adjacency_matrix[node_a.id][node_b.id] == 1: # qui convertire in adjacency list perché sennò va out of bound perché ancestral è un sottografo di original_dag
+                    if node_b in node_a.adjacency_list: # qui convertire in adjacency list perché sennò va out of bound perché ancestral è un sottografo di original_dag
                         checks -= 1
         else: # if set_given is not empty --> conditional independence
             print("conditional independence")
             for node_a in set_a_nodes:
                 for node_b in set_b_nodes:
                     for condition in set_given_nodes:
-                        if are_connected(dag, node_a, node_b, condition):
+                        print("checking: ", node_a, node_b, condition)
+                        if Node.are_connected(dag, node_a, node_b, condition):
                             check -= 1
         if checks == 0:
             return True

@@ -26,7 +26,9 @@ if testing:
     set_b.append(n2)
 
     set_given = []
-    Node.check_independency(dag, set_a, set_b, set_given)
+    n3 = Node.get_node_by_variable(dag, 'a')
+    set_given.append(n3)
+    print(Node.check_independency(dag, set_a, set_b, set_given))
 else:
     # testing of the instance methods
     print("Nodes in the DAG:")

@@ -68,19 +68,23 @@ class Graph:
     def build_adjacency_matrix(self):
         mat = np.zeros(shape = (len(self.nodes_set), len(self.nodes_set)), dtype = int)
         for edge in self.edges_set:
-            i = 0
-            j = 0
+            # keeping track of the starting node of the edge to compose also the adjacency lists
+            first_node = None
+            first_node_idx = 0
+            second_node_idx = 0
             # finding the index of the starting node
             for node in self.nodes_set:
                 if node.variable_name == edge.starting_node:
-                    i = node.id
+                    first_node = node
+                    first_node_idx = node.id
                     break
             # finding the index of the ending node
             for node in self.nodes_set:
                 if node.variable_name == edge.ending_node:
-                    j = node.id
+                    first_node.adjacency_list.append(node)
+                    second_node_idx = node.id
                     break
-            mat[i][j] = 1 # setting to 1 the [i,j] entry of the adjacency matrix
+            mat[first_node_idx][second_node_idx] = 1 # setting to 1 the [i,j] entry of the adjacency matrix
         self.adjacency_matrix = mat
         return
 
