@@ -168,35 +168,37 @@ class Node:
                     bfs_queue.append(adjacent) # enqueuing the newly visited node
         return False
 
+    # this method checks recursively all paths from node_1 to node_2, checking if the conditioning node is traversed
+    def all_paths_with_dfs(dag, node_1, node_2, condition, visited, dfs_paths, found_condition, paths_checked, total_paths):
+        visited[node_1.id] = True
+        dfs_paths.append(node_1)
+        print(dfs_paths)
+        if node_1 == condition:
+            found_condition = True
+
+        if node_1 == node_2:
+            if found_condition:
+                paths_checked += 1
+            total_paths += 1
+        else:
+            for adjacent in [adj for adj in dag.nodes_set if dag.adjacency_matrix[node_1.id][adj.id] == 1]:
+                if not visited[adjacent.id]:
+                    found_condition = False
+                    Node.all_paths_with_dfs(dag, adjacent, node_2, condition, visited, dfs_paths, found_condition, paths_checked, total_paths)
+        visited[node_1.id] = False
+        dfs_paths.pop()
+
     # this method checks if all paths between two given nodes pass through a given condition node
     def are_connected_with_all_paths(dag, node_1, node_2, condition):
         # initializing variable used to check independences
         found_condition = False
         paths_checked = 0
         total_paths = 0
-        # initializing queue to do a Breadth First Search
+        # initializing an array to hold paths for the Depth First Search to discover all paths
         visited = [False for i in range(len(dag.nodes_set))]
-        bfs_queue = deque()
-        # initial condition
-        bfs_queue.append(node_1)
-        visited[node_1.id] = True
-        # looping until the queue is empty
-        while bfs_queue:
-            print(bfs_queue)
-            node = bfs_queue.popleft()
-            # checking if we found the conditioning node
-            if node == condition:
-                found_condition = True
-            # checking if we found the target node
-            if node == node_2:
-                if found_condition:
-                    paths_checked += 1
-                total_paths += 1
-            # looping on the adjacent nodes
-            for adjacent in [adj for adj in dag.nodes_set if dag.adjacency_matrix[node.id][adj.id] == 1]:
-                if not visited[adjacent.id]:
-                    #visited[adjacent.id] = True
-                    bfs_queue.append(adjacent) # enqueuing the newly visited node
+        dfs_paths = []
+        # recursive function call to the dfs procedure
+        Node.all_paths_with_dfs(dag, node_1, node_2, condition, visited, dfs_paths, found_condition, paths_checked, total_paths)
         return paths_checked, total_paths
 
     # this method checks independency between the nodes passed as argument:
@@ -225,7 +227,7 @@ class Node:
                 for node_a in set_a_nodes:
                     for node_b in set_b_nodes:
                         print("checking:", node_a, "ind", node_b, "given", condition)
-                        paths_checked_with_condition, total_paths_checked = Node.are_connected_with_all_paths(dag, node_a, node_b, condition)
+                        paths_checked_with_condition, total_paths_checked = Node.are_connected_with_all_paths(moral, node_a, node_b, condition)
                         print(paths_checked_with_condition, total_paths_checked)
                         if paths_checked_with_condition == total_paths_checked:
                             checks -= 1
@@ -245,3 +247,21 @@ class Node:
         #   se ogni path passa per i nodi che sono in set_given allora la verifica ritorna true
         #   altrimenti se c'è anche solo un path che passa per un nodo che non è in set_given la verifica ritorna false
         #####
+
+
+#while bfs_queue:
+#    print(bfs_queue)
+#    node = bfs_queue.popleft()
+#    # checking if we found the conditioning node
+#    if node == condition:
+#        found_condition = True
+#    # checking if we found the target node
+#    if node == node_2:
+#        if found_condition:
+#            paths_checked += 1
+#        total_paths += 1
+#    # looping on the adjacent nodes
+#    for adjacent in [adj for adj in dag.nodes_set if dag.adjacency_matrix[node.id][adj.id] == 1]:
+#        if not visited[adjacent.id]:
+#            #visited[adjacent.id] = True
+#            bfs_queue.append(adjacent) # enqueuing the newly visited node

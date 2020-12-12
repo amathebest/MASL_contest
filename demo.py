@@ -1,5 +1,7 @@
 # libraries import
 import os
+import pandas as pd
+
 from GraphUtils import Graph
 from Node import Node
 from Edge import Edge
@@ -7,9 +9,8 @@ from Edge import Edge
 # environment variable for the Graphviz library
 os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz 2.44.1/bin/'
 
-# DAG creation
-#definition = "0-1,0-2,2-1,1-3,0-4,4-3,2-5,1-5,4-5,1-6,2-7,3-6,1-8,6-9"
-definition = "a-b,a-c,c-b,b-d,a-e,e-d,c-f,b-f"
+# DAG creation with the definition obtained by the initial analysis conducted in R
+definition = ""
 dag = Graph.create_graph(definition, "directed")
 
 # lezione 26-11 36:07 per applicazione
