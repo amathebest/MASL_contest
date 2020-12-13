@@ -26,9 +26,10 @@ if application:
     mb = Node.get_Markov_blanket(dag, n0)
     print(Node.check_independency(dag, [n0], rest, mb))
 
-testing = False
+testing = True
 if testing:
-    print("test")
+    moralized_dag = dag.get_moralized_dag()
+    moralized_dag.draw_graph("undirected", "Moralized_DAG")
 else:
     # testing of the instance methods
     print("Nodes in the DAG:")

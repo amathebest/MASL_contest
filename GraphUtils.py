@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import graphviz as gv
-from itertools import combinations
+from itertools import combinations, chain
 from collections import Counter
 
 from Node import Node
@@ -44,7 +44,7 @@ class Graph:
         for edge in definition.split(","):
             if '-' in edge:
                 graph.add_edge(edge.split("-")[0], edge.split("-")[1], type)
-        for variable in sorted(list(set(x for l in [variable.split('-') for variable in definition.split(',')] for x in l))):
+        for variable in sorted(list(set(chain(*[variable.split('-') for variable in definition.split(',')])))):
             graph.add_node(variable)
         # building the adjacency matrix of the DAG
         graph.build_adjacency_matrix()
@@ -122,7 +122,9 @@ class Graph:
     def get_moralized_dag(self):
         if self.type != "directed":
             raise RuntimeError('Expected a directed graph as input.')
-        moralized_dag_definition = self.definition.split(',')
+        # starting to construct the moralized DAG from the existing DAG
+        moralized_dag_nodes = self.nodes_set
+        moralized_dag_definition = self.edges_set
         # looping on the transpose of the adjacency matrix to find the unmarried parents in the original DAG
         for col in self.adjacency_matrix.T:
             # acting only if the considered node has 2 common parents
@@ -131,18 +133,25 @@ class Graph:
                 # iterating over all pairs of parents that have a common child
                 for pair in combinations(indeces, 2):
                     # creating the new edge
-                    new_edge = Node.get_node_by_id(self, pair[0]).variable_name + "-" + Node.get_node_by_id(self, pair[1]).variable_name
+                    new_edge = Edge(Node.get_node_by_id(self, pair[0]).variable_name, Node.get_node_by_id(self, pair[1]).variable_name, "directed")
                     # adding an undirected edge to the moralized dag definition
                     if new_edge not in moralized_dag_definition:
                         moralized_dag_definition.append(new_edge)
-                    if new_edge[::-1] not in moralized_dag_definition:
-                        moralized_dag_definition.append(new_edge[::-1])
+                    if new_edge.reverse() not in moralized_dag_definition:
+                        moralized_dag_definition.append(new_edge.reverse())
         # adding the reverse version of each edge if not present
         for edge in moralized_dag_definition:
-            if edge[::-1] not in moralized_dag_definition:
-                moralized_dag_definition.append(edge[::-1])
+            if edge.reverse() not in moralized_dag_definition:
+                moralized_dag_definition.append(edge.reverse())
         # creating the moralized version of the DAG
-        moralized_dag = Graph.create_graph(','.join(moralized_dag_definition), "undirected")
+        definition = ''
+        for edge in moralized_dag_definition:
+            definition += edge.definition + ','
+        # adding leftover nodes which were not connected by edges
+        for node in moralized_dag_nodes:
+            if node.variable_name not in definition:
+                definition += node.variable_name + ','
+        moralized_dag = Graph.create_graph(definition[:-1], "undirected")
         return moralized_dag
 
     # this method returns the ancestral subgraph of the given node or set of nodes

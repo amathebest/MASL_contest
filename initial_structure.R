@@ -58,3 +58,4 @@ for (i in 1:nrow(adj_mat)) {
         }
     }
 }
+definition
