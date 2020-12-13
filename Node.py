@@ -87,7 +87,7 @@ class Node:
             my_node = variable
         ancestors = []
         for node in dag.nodes_set:
-            if Node.are_connected(dag, node, my_node):
+            if Node.are_connected_bfs(dag, node, my_node):
                 ancestors.append(node)
         return ancestors
 
@@ -102,7 +102,7 @@ class Node:
             my_node = variable
         descendants = []
         for node in dag.nodes_set:
-            if Node.are_connected(dag, my_node, node):
+            if Node.are_connected_bfs(dag, my_node, node):
                 descendants.append(node)
         return descendants
 
@@ -138,7 +138,7 @@ class Node:
 
     # this method determines if there is a path between the two nodes passed as argument
     # the node can be passed both in form of a string (variable name) and node itself
-    def are_connected(dag, variable_1, variable_2, condition = None):
+    def are_connected_bfs(dag, variable_1, variable_2):
         # finding the two nodes in the graph
         node_1 = None
         node_2 = None
@@ -148,8 +148,6 @@ class Node:
         else:
             node_1 = variable_1
             node_2 = variable_2
-        # initializing variable used to check independences
-        found_condition = False
         # initializing queue to do a Breadth First Search
         visited = [False for i in range(len(dag.nodes_set))]
         bfs_queue = deque()
@@ -162,79 +160,117 @@ class Node:
             if node == node_2:
                 return True
             # looping on the adjacent nodes
-            for adjacent in [adj for adj in dag.nodes_set if dag.adjacency_matrix[node.id][adj.id] == 1]:
+            for adjacent in node_1.adjacency_list:
                 if not visited[adjacent.id]:
                     visited[adjacent.id] = True
                     bfs_queue.append(adjacent) # enqueuing the newly visited node
         return False
 
-    # this method checks recursively all paths from node_1 to node_2, checking if the conditioning node is traversed
-    def all_paths_with_dfs(dag, node_1, node_2, condition, visited, dfs_paths, found_condition, paths_checked, total_paths):
-        visited[node_1.id] = True
-        dfs_paths.append(node_1)
-        print(dfs_paths)
-        if node_1 == condition:
-            found_condition = True
-
-        if node_1 == node_2:
-            if found_condition:
-                paths_checked += 1
-            total_paths += 1
-        else:
-            for adjacent in [adj for adj in dag.nodes_set if dag.adjacency_matrix[node_1.id][adj.id] == 1]:
-                if not visited[adjacent.id]:
-                    found_condition = False
-                    Node.all_paths_with_dfs(dag, adjacent, node_2, condition, visited, dfs_paths, found_condition, paths_checked, total_paths)
-        visited[node_1.id] = False
-        dfs_paths.pop()
-
-    # this method checks if all paths between two given nodes pass through a given condition node
-    def are_connected_with_all_paths(dag, node_1, node_2, condition):
-        # initializing variable used to check independences
-        found_condition = False
-        paths_checked = 0
-        total_paths = 0
-        # initializing an array to hold paths for the Depth First Search to discover all paths
+    # this method checks if node_a is separated from node_b by finding a path that doesn't cross any node of the conditioning set
+    def are_separated_bfs(dag, node_1, node_2, conditioning_set):
+        # initializing queue to do a Breadth First Search
         visited = [False for i in range(len(dag.nodes_set))]
-        dfs_paths = []
-        # recursive function call to the dfs procedure
-        Node.all_paths_with_dfs(dag, node_1, node_2, condition, visited, dfs_paths, found_condition, paths_checked, total_paths)
-        return paths_checked, total_paths
+        bfs_queue = deque()
+        # initial condition
+        bfs_queue.append(node_1)
+        visited[node_1.id] = True
+        # looping until the queue is empty
+        while bfs_queue:
+            node = bfs_queue.popleft()
+            if node == node_2:
+                return False
+            # looping on the adjacent nodes
+            for adjacent in [node for node in node_1.adjacency_list if node not in conditioning_set]:
+                if not visited[adjacent.id]:
+                    visited[adjacent.id] = True
+                    bfs_queue.append(adjacent) # enqueuing the newly visited node
+        return True
 
     # this method checks independency between the nodes passed as argument:
     # set_a = set of nodes to check independecy from set_b
-    # set_given = optional set of nodes that will be the set of nodes which will be the conditioning nodes of the independency
-    def check_independency(dag, set_a_nodes, set_b_nodes, set_given_nodes = []):
+    # conditioning_set = optional set of nodes that will be the set of nodes which will be the conditioning nodes of the independency
+    # note that conditioning_set can be empty: in this case we switch to marginal independence
+    def check_independency(dag, set_a_nodes, set_b_nodes, set_given_nodes, mode):
+        # setup phase necessary to accept both nodes objects and strings as parameters
+        set_a, set_b, conditioning_set = Node.clean_sets(dag, set_a_nodes, set_b_nodes, set_given_nodes)
         # building the ancestral DAG composed only by the ancestors of the given nodes sets
-        anc = dag.get_ancestral_subgraph(set_a_nodes + set_b_nodes + set_given_nodes)
+        anc = dag.get_ancestral_subgraph(set_a + set_b + conditioning_set)
+        print(anc.definition)
         # building the moralized DAG of the ancestral DAG
         moral = anc.get_moralized_dag()
         moral.draw_graph("undirected", "test")
         # distinguish between the marginal independence or the conditional independence
-        if not set_given_nodes: # if set_given is empty --> marginal independence
-            checks = len(set_a_nodes) * len(set_b_nodes)
-            for node_a in set_a_nodes:
-                for node_b in set_b_nodes:
+        if not conditioning_set: # if set_given is empty --> marginal independence
+            checks = len(set_a) * len(set_b)
+            for node_a in set_a:
+                for node_b in set_b:
                     if node_b in node_a.adjacency_list:
                         checks -= 1
             if checks == 0:
                 return True
             else:
                 return False
+
+            print("ok")
         else: # if set_given is not empty --> conditional independence
-            checks = len(set_a_nodes) * len(set_b_nodes) * len(set_given_nodes)
-            for condition in set_given_nodes:
-                for node_a in set_a_nodes:
-                    for node_b in set_b_nodes:
-                        print("checking:", node_a, "ind", node_b, "given", condition)
-                        paths_checked_with_condition, total_paths_checked = Node.are_connected_with_all_paths(moral, node_a, node_b, condition)
-                        print(paths_checked_with_condition, total_paths_checked)
-                        if paths_checked_with_condition == total_paths_checked:
-                            checks -= 1
-            if checks == 0:
-                return True
+            # running a BFS from each node of set_a to each node of set_b avoiding conditioning nodes
+            # if we find a path that doesn't cross any conditioning node, then the conditioning set doesn't separate node_a and node_b
+            for node_a in set_a:
+                node_a_in_subgraph = Node.get_node_by_variable(moral, node_a.variable_name)
+                for node_b in set_b:
+                    node_b_in_subgraph = Node.get_node_by_variable(moral, node_b.variable_name)
+                    if not Node.are_separated_bfs(moral, node_a_in_subgraph, node_b_in_subgraph, conditioning_set):
+                        return False
+                    else:
+                        continue
+                else:
+                    continue
+                break
+            return True
+
+    # this method cleans the three sets of nodes that will be used to create the ancestral graph in the dependency check method
+    def clean_sets(dag, set_a_nodes, set_b_nodes, set_given_nodes):
+        set_a = []
+        set_b = []
+        conditioning_set = []
+        # cleaning set_a
+        if isinstance(set_a_nodes, list):
+            if isinstance(set_a_nodes[0], Node):
+                set_a = set_a_nodes
             else:
-                return False
+                for variable in set_a_nodes:
+                    set_a.append(Node.get_node_by_variable(dag, variable))
+        else:
+            if isinstance(set_a_nodes, Node):
+                set_a = [set_a_nodes]
+            else:
+                set_a.append(Node.get_node_by_variable(dag, variable))
+        # cleaning set_b
+        if isinstance(set_b_nodes, list):
+            if isinstance(set_b_nodes[0], Node):
+                set_b = set_b_nodes
+            else:
+                for variable in set_b_nodes:
+                    set_b.append(Node.get_node_by_variable(dag, variable))
+        else:
+            if isinstance(set_b_nodes, Node):
+                set_b = [set_b_nodes]
+            else:
+                set_b.append(Node.get_node_by_variable(dag, variable))
+        # cleaning conditioning_set
+        if isinstance(set_given_nodes, list):
+            if set_given_nodes:
+                if isinstance(set_given_nodes[0], Node):
+                    conditioning_set = set_given_nodes
+                else:
+                    for variable in set_given_nodes:
+                        conditioning_set.append(Node.get_node_by_variable(dag, variable))
+        else:
+            if isinstance(set_given_nodes, Node):
+                conditioning_set = [set_given_nodes]
+            else:
+                conditioning_set.append(Node.get_node_by_variable(dag, variable))
+        return set_a, set_b, conditioning_set
 
         #####
         # per checkare indipendenza, formare l'ancestral graph a partire dall'insieme dei nodes passati come argomento
@@ -247,21 +283,3 @@ class Node:
         #   se ogni path passa per i nodi che sono in set_given allora la verifica ritorna true
         #   altrimenti se c'è anche solo un path che passa per un nodo che non è in set_given la verifica ritorna false
         #####
-
-
-#while bfs_queue:
-#    print(bfs_queue)
-#    node = bfs_queue.popleft()
-#    # checking if we found the conditioning node
-#    if node == condition:
-#        found_condition = True
-#    # checking if we found the target node
-#    if node == node_2:
-#        if found_condition:
-#            paths_checked += 1
-#        total_paths += 1
-#    # looping on the adjacent nodes
-#    for adjacent in [adj for adj in dag.nodes_set if dag.adjacency_matrix[node.id][adj.id] == 1]:
-#        if not visited[adjacent.id]:
-#            #visited[adjacent.id] = True
-#            bfs_queue.append(adjacent) # enqueuing the newly visited node

@@ -3,14 +3,12 @@ class Edge:
     starting_node = ""
     ending_node = ""
     type = ""
-    id = 0
 
     def __init__(self, starting_node, ending_node, type):
         self.definition = starting_node + "-" + ending_node
         self.starting_node = starting_node
         self.ending_node = ending_node
         self.type = type
-        self.id = 0
 
     def __str__(self):
         return self.definition

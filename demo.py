@@ -14,22 +14,21 @@ definition = "Algebra-Fisica1,Algebra-Geometria1,Analisi1-Analisi2,Analisi2-Geom
 dag = Graph.create_graph(definition, "directed")
 
 # lezione 26-11 36:07 per applicazione
-application = False
-if application:
-    n0 = dag.nodes_set[0]
-    rest = []
-    rest.append(dag.nodes_set[1])
-    rest.append(dag.nodes_set[2])
-    rest.append(dag.nodes_set[3])
-    rest.append(dag.nodes_set[4])
-    rest.append(dag.nodes_set[5])
-    mb = Node.get_Markov_blanket(dag, n0)
-    print(Node.check_independency(dag, [n0], rest, mb))
+
 
 testing = True
 if testing:
-    moralized_dag = dag.get_moralized_dag()
-    moralized_dag.draw_graph("undirected", "Moralized_DAG")
+    n0 = Node.get_node_by_variable(dag, "Geometria1")
+    rest = []
+    for node in [node_1 for node_1 in dag.nodes_set if node_1 != n0]:
+        rest.append(node)
+    mb = Node.get_Markov_blanket(dag, n0)
+
+    found_path_with_no_sep = Node.check_independency(dag, ["Fisica2", "Geometria1"], ["Algebra"], [], "strings")
+
+    print("Result:")
+    print(found_path_with_no_sep)
+
 else:
     # testing of the instance methods
     print("Nodes in the DAG:")
