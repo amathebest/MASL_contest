@@ -18,16 +18,16 @@ dag = Graph.create_graph(definition, "directed")
 
 testing = True
 if testing:
-    n0 = Node.get_node_by_variable(dag, "Geometria1")
-    rest = []
-    for node in [node_1 for node_1 in dag.nodes_set if node_1 != n0]:
-        rest.append(node)
-    mb = Node.get_Markov_blanket(dag, n0)
+    print("Checking independence...")
+    dag.draw_graph("directed", "DAG")
+    set_a = ["Fisica2", "Geometria1"]
+    set_b = ["Algebra"]
+    conditioning = ["Fisica1", "Geometria2"]
 
-    found_path_with_no_sep = Node.check_independency(dag, ["Fisica2", "Geometria1"], ["Algebra"], [], "strings")
-
-    print("Result:")
-    print(found_path_with_no_sep)
+    if Node.check_independency(dag, set_a, set_b, conditioning, "strings"):
+        print("Set A:", set_a, "is independent from Set B:", set_b, "given Conditioning:", conditioning)
+    else:
+        print("Set A:", set_a, "is NOT independent from Set B:", set_b, "given Conditioning:", conditioning)
 
 else:
     # testing of the instance methods

@@ -195,10 +195,13 @@ class Node:
         set_a, set_b, conditioning_set = Node.clean_sets(dag, set_a_nodes, set_b_nodes, set_given_nodes)
         # building the ancestral DAG composed only by the ancestors of the given nodes sets
         anc = dag.get_ancestral_subgraph(set_a + set_b + conditioning_set)
-        print(anc.definition)
         # building the moralized DAG of the ancestral DAG
         moral = anc.get_moralized_dag()
-        moral.draw_graph("undirected", "test")
+        # adding not connected nodes
+        for node in dag.nodes_set:
+            if node not in moral.nodes_set:
+                moral.add_node(node.variable_name)
+        moral.draw_graph("undirected", "Moralized_ancestral_DAG")
         # distinguish between the marginal independence or the conditional independence
         if not conditioning_set: # if set_given is empty --> marginal independence
             checks = len(set_a) * len(set_b)
@@ -210,8 +213,6 @@ class Node:
                 return True
             else:
                 return False
-
-            print("ok")
         else: # if set_given is not empty --> conditional independence
             # running a BFS from each node of set_a to each node of set_b avoiding conditioning nodes
             # if we find a path that doesn't cross any conditioning node, then the conditioning set doesn't separate node_a and node_b
