@@ -42,8 +42,9 @@ class Graph:
         graph = Graph(definition, type)
         # DAG filling
         for edge in definition.split(","):
-            graph.add_edge(edge.split("-")[0], edge.split("-")[1], type)
-        for variable in sorted([c for c in list(set(definition)) if c.isalpha() or c.isdigit()]):
+            if '-' in edge:
+                graph.add_edge(edge.split("-")[0], edge.split("-")[1], type)
+        for variable in sorted(list(set(x for l in [variable.split('-') for variable in definition.split(',')] for x in l))):
             graph.add_node(variable)
         # building the adjacency matrix of the DAG
         graph.build_adjacency_matrix()
