@@ -169,11 +169,3 @@ class Graph:
         # creating the ancestral graph
         ancestral_subgraph = Graph.create_graph(','.join(ancestral_subgraph_definition), "directed")
         return ancestral_subgraph
-
-    # this method returns the cliques found in the given moralized DAG, or in general in the given
-    # undirected graph
-    def get_cliques(moralized_dag):
-
-        return
-
-#

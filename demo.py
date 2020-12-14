@@ -14,21 +14,9 @@ definition = "Algebra-Fisica1,Algebra-Geometria1,Analisi1-Analisi2,Analisi2-Geom
 dag = Graph.create_graph(definition, "directed")
 
 # lezione 26-11 36:07 per applicazione
-
-
 testing = True
 if testing:
-    print("Checking independence...")
-    dag.draw_graph("directed", "DAG")
-    set_a = ["Fisica2", "Geometria1"]
-    set_b = ["Algebra"]
-    conditioning = ["Fisica1", "Geometria2"]
-
-    if Node.check_independency(dag, set_a, set_b, conditioning, "strings"):
-        print("Set A:", set_a, "is independent from Set B:", set_b, "given Conditioning:", conditioning)
-    else:
-        print("Set A:", set_a, "is NOT independent from Set B:", set_b, "given Conditioning:", conditioning)
-
+    print("Test")
 else:
     # testing of the instance methods
     print("Nodes in the DAG:")
@@ -85,5 +73,17 @@ else:
     anc0.draw_graph("directed", "ancestral_DAG")
     print("Adjacency matrix of the ancestral graph:")
     print(anc0.get_adjacency_matrix())
+
+    # independence checking
+    print("Checking independence...")
+    dag.draw_graph("directed", "DAG")
+    set_a = ["Geometria1"]
+    set_b = ["Fisica2"]
+    conditioning = ["Algebra", "Analisi1"]
+
+    if Node.check_independency(dag, set_a, set_b, conditioning, "strings"):
+        print("Set A:", set_a, "is independent from Set B:", set_b, "given Conditioning:", conditioning)
+    else:
+        print("Set A:", set_a, "is NOT independent from Set B:", set_b, "given Conditioning:", conditioning)
 
 #
