@@ -122,8 +122,8 @@ class Graph:
         if self.type != "directed":
             raise RuntimeError('Expected a directed graph as input.')
         # starting to construct the moralized DAG from the existing DAG
-        moralized_dag_nodes = self.nodes_set
-        moralized_dag_definition = self.edges_set
+        moralized_dag_nodes = self.nodes_set.copy()
+        moralized_dag_definition = self.edges_set.copy()
         # looping on the transpose of the adjacency matrix to find the unmarried parents in the original DAG
         for col in self.adjacency_matrix.T:
             # acting only if the considered node has 2 common parents

@@ -6,6 +6,7 @@ class Node:
     id = 0
     isRoot = False
     isLeaf = False
+    visited = False
 
     def __init__(self, variable_name):
         self.variable_name = variable_name
@@ -13,6 +14,7 @@ class Node:
         self.id = 0
         self.isRoot = False
         self.isLeaf = False
+        self.visited = False
 
     def __str__(self):
         return self.variable_name
@@ -140,49 +142,51 @@ class Node:
     # the node can be passed both in form of a string (variable name) and node itself
     def are_connected(dag, variable_1, variable_2):
         # finding the two nodes in the graph
-        node_1 = None
-        node_2 = None
+        starting_node = None
+        target_node = None
         if isinstance(variable_1, str) and isinstance(variable_2, str):
-            node_1 = Node.get_node_by_variable(dag, variable_1)
-            node_2 = Node.get_node_by_variable(dag, variable_2)
+            starting_node = Node.get_node_by_variable(dag, variable_1)
+            target_node = Node.get_node_by_variable(dag, variable_2)
         else:
-            node_1 = variable_1
-            node_2 = variable_2
-        # initializing queue to do a Breadth First Search
-        visited = [False for i in range(len(dag.nodes_set))]
+            starting_node = variable_1
+            target_node = variable_2
+        # setting each node to be not visited
+        for node in dag.nodes_set:
+            node.visited = False
+        # initializing queue to do a Breadth First Search and inserting the starting node
         bfs_queue = deque()
-        # initial condition
-        bfs_queue.append(node_1)
-        visited[node_1.id] = True
+        bfs_queue.append(starting_node)
+        starting_node.visited = True
         # looping until the queue is empty
         while bfs_queue:
             node = bfs_queue.popleft()
-            if node == node_2:
+            if node == target_node:
                 return True
             # looping on the adjacent nodes
-            for adjacent in node_1.adjacency_list:
-                if not visited[adjacent.id]:
-                    visited[adjacent.id] = True
+            for adjacent in node.adjacency_list:
+                if not adjacent.visited:
+                    adjacent.visited = True
                     bfs_queue.append(adjacent) # enqueuing the newly visited node
         return False
 
     # this method checks if node_a is separated from node_b by finding a path that doesn't cross any node of the conditioning set
-    def are_separated_bfs(dag, node_1, node_2, conditioning_set):
-        # initializing queue to do a Breadth First Search
-        visited = [False for i in range(len(dag.nodes_set))]
+    def are_separated_bfs(dag, starting_node, target_node, conditioning_set):
+        # setting each node to be not visited
+        for node in dag.nodes_set:
+            node.visited = False
+        # initializing queue to do a Breadth First Search and inserting the starting node
         bfs_queue = deque()
-        # initial condition
-        bfs_queue.append(node_1)
-        visited[node_1.id] = True
+        bfs_queue.append(starting_node)
+        starting_node.visited = True
         # looping until the queue is empty
         while bfs_queue:
             node = bfs_queue.popleft()
-            if node == node_2:
+            if node == target_node:
                 return False
             # looping on the adjacent nodes
-            for adjacent in [node for node in node_1.adjacency_list if node not in conditioning_set]:
-                if not visited[adjacent.id]:
-                    visited[adjacent.id] = True
+            for adjacent in [adj_node for adj_node in node.adjacency_list if adj_node not in conditioning_set]:
+                if not adjacent.visited:
+                    adjacent.visited = True
                     bfs_queue.append(adjacent) # enqueuing the newly visited node
         return True
 
@@ -206,13 +210,13 @@ class Node:
             for node_a in set_a:
                 for node_b in set_b:
                     if node_b not in node_a.adjacency_list:
-                        return False
+                        return True
                     else:
                         continue
                 else:
                     continue
                 break
-            return True
+            return False
         else: # if set_given is not empty --> conditional independence
             # running a BFS from each node of set_a to each node of set_b avoiding conditioning nodes
             # if we find a path that doesn't cross any conditioning node, then the conditioning set doesn't separate node_a and node_b
