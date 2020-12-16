@@ -10,11 +10,12 @@ from Edge import Edge
 os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz 2.44.1/bin/'
 
 # DAG creation with the definition obtained by the initial analysis conducted in R
-definition = "Algebra-Fisica1,Algebra-Geometria1,Analisi1-Analisi2,Analisi2-Geometria2,Geometria1-Geometria2,Geometria2-MecRaz,Fisica2"
+definition = "Algebra-Fisica1,Algebra-Geometria1,Analisi1-Analisi2,Analisi2-Geometria2,Fisica1-Fisica2,Geometria1-Geometria2,Geometria2-MecRaz"
+#definition = "1-2,1-3,2-4,2-5,3-5,3-6,4-7,5-7,5-6,6-7"
 dag = Graph.create_graph(definition, "directed")
 
 # lezione 26-11 36:07 per applicazione
-testing = True
+testing = False
 if testing:
     print("Test")
 else:
@@ -70,13 +71,12 @@ else:
 
     # ancestral graph of the set of nodes passed as argument
     anc0 = dag.get_ancestral_subgraph(['Geometria1', 'Analisi1', 'Analisi2'])
-    anc0.draw_graph("directed", "ancestral_DAG")
+    anc0.draw_graph("undirected", "ancestral_DAG")
     print("Adjacency matrix of the ancestral graph:")
     print(anc0.get_adjacency_matrix())
 
     # independence checking
     print("Checking independence...")
-    dag.draw_graph("directed", "DAG")
     set_a = ["Geometria1"]
     set_b = ["Fisica2"]
     conditioning = ["Algebra", "Analisi1"]

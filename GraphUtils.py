@@ -89,23 +89,20 @@ class Graph:
         self.adjacency_matrix = mat
         return
 
-    # this method draws the graph based on the type of graph passed as argument
-    def draw_graph(self, type, comment):
+    # this method draws the graph based on the type of graph passed as argument with a given comment on its details
+    def draw_graph(self, type, comment = ""):
         name = os.path.dirname(os.path.realpath(__file__)) + "_" + comment
         # creating the skeleton of the DAG
         if type == "directed":
             dot = gv.Digraph(comment = comment)
-            dot.graph_attr['Gdpi'] = '1000'
             # building DAG nodes
             for node in self.nodes_set:
                 dot.node(str(node.variable_name), fontname = "consolas")
             # building DAG edges
             for edge in self.edges_set:
                 dot.edge(str(edge.starting_node), str(edge.ending_node), fontname = "consolas")
-            dot.render(name, view = True, format = "png")
         else:
             dot = gv.Graph()
-            dot.graph_attr['Gdpi'] = '1000'
             # building DAG nodes
             for node in self.nodes_set:
                 dot.node(str(node.variable_name), fontname = "consolas")
@@ -115,7 +112,9 @@ class Graph:
                 if edge.reverse() not in edges_already_drawn:
                     dot.edge(str(edge.starting_node), str(edge.ending_node), fontname = "consolas")
                     edges_already_drawn.append(edge)
-            dot.render(name, view = True, format = "png")
+        dot.graph_attr['Gdpi'] = '1000'
+        dot.graph_attr['rankdir'] = 'LR'
+        dot.render(name, view = True, format = "png")
         return
 
     # this method creates the moralized DAG starting from the one passed as argument

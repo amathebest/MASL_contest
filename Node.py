@@ -87,7 +87,7 @@ class Node:
             my_node = variable
         ancestors = []
         for node in dag.nodes_set:
-            if Node.are_connected_bfs(dag, node, my_node):
+            if Node.are_connected(dag, node, my_node):
                 ancestors.append(node)
         return ancestors
 
@@ -102,7 +102,7 @@ class Node:
             my_node = variable
         descendants = []
         for node in dag.nodes_set:
-            if Node.are_connected_bfs(dag, my_node, node):
+            if Node.are_connected(dag, my_node, node):
                 descendants.append(node)
         return descendants
 
@@ -138,7 +138,7 @@ class Node:
 
     # this method determines if there is a path between the two nodes passed as argument
     # the node can be passed both in form of a string (variable name) and node itself
-    def are_connected_bfs(dag, variable_1, variable_2):
+    def are_connected(dag, variable_1, variable_2):
         # finding the two nodes in the graph
         node_1 = None
         node_2 = None

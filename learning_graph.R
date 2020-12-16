@@ -1,3 +1,4 @@
+library(ggm)
 library(SIN)
 
 # Data import
@@ -5,20 +6,22 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 data <- read.table("esami_matem.txt", header = TRUE, sep = " ")
 data$Anno <- NULL
 
-# SINful procedure that gives the p-values relative to the corresponding test on the edge
-pvals <- sinUG(var(data), n = nrow(data), holm=T)
-pvals # this shows very high p-values on the lower correlations and low p-values on high correlations
+# Variable correlation overview
+cor(data)
+
+# SINful procedure that gives the p-values relative to the corresponding test on each edge
+pvals <- sinUG(var(data), n = nrow(data), holm = T)
 
 # Plotting the p-values of the tests for each edge
-alpha_value = 0.20
+alpha_value = 0.15
 plotUGpvalues(pvals, legend = F) # displays each edge with the corresponding p-value 
 abline(h = alpha_value, col = "blue")
 
 # Adjacency matrix of the obtained graph
-adj_mat <- getgraph(pvals, alpha = alpha_value, type="UG")
+adj_mat <- getgraph(pvals, alpha = alpha_value, type = "UG")
 
 # Plotting the obtained graph with the chosen value of alpha
-drawGraph(getgraph(pvals, alpha = alpha_value, type="UG"))
+drawGraph(getgraph(pvals, alpha = alpha_value, type = "UG"))
 
 # Analysis:
 # We can assume that the first course (like Analysis 1) and the second one (like Analysis 2) are linked by
@@ -46,10 +49,14 @@ adj_mat["Geometria1", "Algebra"] = 0
 adj_mat["Geometria2", "Analisi2"] = 0
 adj_mat["MecRaz", "Geometria2"] = 0
 
+# We adjust the final result by adding an edge from Fisica1 to Fisica2 since it makes sense to think that such
+# an edge exist (also due to the fact that its p-value in the SINful procedure matrix is not that high). This is
+# done also to prevent second type errors:
+adj_mat["Fisica1", "Fisica2"] = 1
+
 # Obtaining the graph definition that will be used to create the graph with my package
 names <- rownames(adj_mat)
 definition <- ""
-
 for (i in 1:nrow(adj_mat)) {
     for (j in 1:nrow(adj_mat)) {
         if (adj_mat[i,j] == 1) {
