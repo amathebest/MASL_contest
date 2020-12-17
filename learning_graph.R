@@ -13,7 +13,7 @@ cor(data)
 pvals <- sinUG(var(data), n = nrow(data), holm = T)
 
 # Plotting the p-values of the tests for each edge
-alpha_value = 0.15
+alpha_value = 0.30
 plotUGpvalues(pvals, legend = F) # displays each edge with the corresponding p-value 
 abline(h = alpha_value, col = "blue")
 
@@ -39,20 +39,16 @@ adj_mat["Geometria2", "Analisi2"] = 0
 
 # For example, we can also assume that it's possible that Algebra gives proficiency on the exam Fisica1.
 # For this reason we can direct the edge between Algebra and Fisica1 to be from Algebra and Fisica1, deleting
-# the other direction:
+# the other direction. We do the same also for Geometria1:
 adj_mat["Fisica1", "Algebra"] = 0
-
-# By exploiting the same principle, we can assume an ordering also between Algebra and Geometria1:
 adj_mat["Geometria1", "Algebra"] = 0
 
-# Finally we direct two more edges with an arbitrary order:
+# Following the same idea, we direct some more edges with an arbitrary logical order:
 adj_mat["Geometria2", "Analisi2"] = 0
 adj_mat["MecRaz", "Geometria2"] = 0
-
-# We adjust the final result by adding an edge from Fisica1 to Fisica2 since it makes sense to think that such
-# an edge exist (also due to the fact that its p-value in the SINful procedure matrix is not that high). This is
-# done also to prevent second type errors:
-adj_mat["Fisica1", "Fisica2"] = 1
+adj_mat["MecRaz", "Fisica1"] = 0
+adj_mat["Geometria1", "Analisi1"] = 0
+adj_mat["Algebra", "Analisi1"] = 0
 
 # Obtaining the graph definition that will be used to create the graph with my package
 names <- rownames(adj_mat)
